@@ -1,0 +1,76 @@
+{
+  "name": "Tech123",
+  "description": "面向科技兴趣读者的公众号专题，用具体问题讲清 AI、编程、视觉创作和技术应用。",
+  "audience": "对 AI 和科技应用感兴趣、希望看懂原理并能实际使用的普通读者",
+  "outlineLabel": "写作思路",
+  "directionLabel": "说清本篇的问题与目标",
+  "default": false,
+  "structure": "根据选题选择科普、教程、面试解答、行业案例或科技评论的组织方式；章节和篇幅由材料决定，不套固定段数。",
+  "workflow": "staged",
+  "styleMemory": true,
+  "writingSkill": "human-writing",
+  "directionLength": {
+    "min": 50,
+    "max": 120
+  },
+  "styleMemoryCategories": [
+    {
+      "name": "面试解答",
+      "keywords": [
+        "面试",
+        "答题"
+      ]
+    },
+    {
+      "name": "行业应用",
+      "keywords": [
+        "理发",
+        "门店",
+        "行业",
+        "品牌",
+        "电商",
+        "企业",
+        "KV"
+      ]
+    },
+    {
+      "name": "视觉创作",
+      "keywords": [
+        "图片",
+        "视觉",
+        "海报",
+        "图像",
+        "摄影",
+        "绘画"
+      ]
+    },
+    {
+      "name": "视觉教程",
+      "keywords": [
+        "图片",
+        "视觉",
+        "海报",
+        "图像",
+        "摄影",
+        "绘画"
+      ]
+    },
+    {
+      "name": "科技评论",
+      "keywords": [
+        "评论",
+        "争议",
+        "价值",
+        "趋势",
+        "反思",
+        "AI率"
+      ]
+    },
+    {
+      "name": "技术科普",
+      "keywords": []
+    }
+  ],
+  "styleMemoryDefaultCategory": "技术科普",
+  "styleMemoryGenericLabel": "通用"
+}

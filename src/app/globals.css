@@ -1,0 +1,1014 @@
+/* 冷灰纸面与靛蓝操作色；双栏分别承载讨论和可编辑成果。 */
+:root {
+  --paper: #ffffff;
+  --canvas: #f0f3f8;
+  --ink: #202d43;
+  --muted: #67758a;
+  --line: #dce3ed;
+  --accent: #345bc6;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei",
+    sans-serif;
+  font-size: 14px;
+}
+main {
+  max-width: 1500px;
+  margin: auto;
+  padding: 28px 36px;
+}
+/* 写作页只允许滚到阶段导航；工作区固定后，正文和反馈各自在面板内滚动。 */
+.workspace-page {
+  height: 100dvh;
+  padding-bottom: 0;
+  overflow-y: auto;
+}
+/* 桌面端隐藏外层滚动轨道，保留滚轮、触控及键盘滚动；面板内部滚动条不受影响。 */
+@media (min-width: 851px) {
+  /* 将写作页约束在视口内，阻断子元素把 body 撑高形成第二条外层滚动条。 */
+  html:has(.workspace-page), body:has(.workspace-page) {
+    height: 100%;
+    overflow: hidden;
+  }
+  .workspace-page {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    scrollbar-width: none;
+  }
+  .workspace-page::-webkit-scrollbar { display: none; }
+}
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+button {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 10px 15px;
+  cursor: pointer;
+}
+button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+/* 主按钮悬停仍保留白字，避免通用 hover 将文字变成蓝色而难以辨认。 */
+button.primary:hover:not(:disabled) {
+  background: #294ba8;
+  border-color: #294ba8;
+  color: white;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+input,
+textarea,
+select {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: var(--paper);
+}
+textarea {
+  resize: vertical;
+  line-height: 1.8;
+}
+input:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+label {
+  display: grid;
+  gap: 8px;
+}
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+h1 {
+  font-size: 21px;
+  margin-bottom: 5px;
+}
+h2 {
+  font-size: 17px;
+  margin-bottom: 6px;
+}
+p {
+  line-height: 1.7;
+}
+.topbar,
+.brand,
+.project-actions,
+.project-heading,
+.document-heading,
+.discussion-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.brand {
+  justify-content: flex-start;
+}
+.brand p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.brand-mark {
+  width: 42px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  background: var(--ink);
+  color: white;
+  border-radius: 5px 14px 5px 5px;
+  font:
+    26px "Songti SC",
+    SimSun,
+    serif;
+}
+.project-actions select {
+  max-width: 230px;
+}
+.app-navigation {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.app-navigation a, .app-navigation button {
+  border-color: transparent;
+  background: transparent;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.logout-button { color: #8e3030 !important; }
+.app-navigation a.active, .app-navigation button.active {
+  color: var(--accent);
+  font-weight: 600;
+}
+.app-navigation a:hover, .app-navigation button:hover:not(:disabled) { border-color: transparent; }
+.management-page { max-width: 1240px; }
+.management-page > .topbar { margin-bottom: 34px; }
+.project-groups { display: grid; gap: 18px; }
+.project-tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--line); }
+.project-tabs button { display: inline-flex; align-items: center; gap: 8px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: var(--muted); padding: 10px 14px 9px; }
+.project-tabs button:hover { background: var(--soft); color: var(--ink); }
+.project-tabs button.active { border-bottom-color: var(--accent); color: var(--ink); font-weight: 650; }
+.project-tabs button span { min-width: 18px; border-radius: 999px; background: var(--soft); color: var(--muted); font-size: 12px; line-height: 18px; }
+.project-group { border: 1px solid var(--line); border-radius: 10px; background: var(--paper); padding: 20px 24px; }
+.project-group > header, .project-group li, .project-row-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.project-group h2, .project-group h3 { margin-bottom: 4px; }
+.project-group header p, .project-group li p { margin: 0; color: var(--muted); font-size: 12px; }
+.project-group > header > span { color: var(--muted); white-space: nowrap; }
+.project-group ul { list-style: none; padding: 0; margin: 18px 0 0; border-top: 1px solid var(--line); }
+.project-group li { padding: 14px 0; border-bottom: 1px solid var(--line); }
+.project-group li:last-child { border-bottom: 0; }
+.project-row-actions { flex-shrink: 0; }
+.confirm-dialog { width: min(520px, calc(100vw - 32px)); border: 1px solid var(--line); border-radius: 12px; padding: 24px; color: var(--ink); box-shadow: 0 20px 70px #202d4366; }
+.confirm-dialog::backdrop { background: #202d4366; }
+.confirm-dialog p { color: var(--muted); }
+.confirm-dialog label { margin-top: 18px; }
+.confirm-dialog footer { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+button.danger { color: #a13232; border-color: #e5b5b5; }
+button.danger:hover:not(:disabled), button.danger:focus-visible { color: white; border-color: #a13232; background: #a13232; }
+.topic-choice-list { display: grid; gap: 10px; margin-top: 18px; }
+.topic-choice-list label { grid-template-columns: auto 1fr; align-items: start; padding: 13px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+.topic-choice-list label.selected { border-color: var(--accent); background: #f4f7ff; }
+.topic-choice-list span { display: grid; gap: 4px; }
+.topic-choice-list small { color: var(--muted); line-height: 1.5; }
+.memory-topic-picker { width: min(380px, 100%); margin-bottom: 20px; }
+.project-context {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  min-height: 58px;
+  margin: 16px 0 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.context-topic { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+.context-topic select { width: auto; min-width: 110px; padding: 7px 28px 7px 9px; }
+.context-description { flex: 1 1 260px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.title-input {
+  flex: 0 1 320px;
+  min-width: 180px;
+  padding: 4px 0;
+  background: transparent;
+  border-color: transparent;
+  font: 600 18px "Songti SC", SimSun, serif;
+}
+.save-state,
+.hint,
+.discussion-heading span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.error {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: #fff0ef;
+  border-left: 3px solid #b54242;
+  color: #8e3030;
+  overflow-wrap: anywhere;
+}
+.steps {
+  /* 四阶段在窄屏可横向滚动；桌面端由工作区固定壳统一固定。 */
+  overflow-x: auto;
+  flex: 0 0 auto;
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+  padding: 5px 0 0;
+  background: var(--canvas);
+}
+.steps button {
+  flex-shrink: 0;
+  background: transparent;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  padding: 10px 18px;
+}
+.steps button.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.steps span {
+  margin-right: 12px;
+  font:
+    12px ui-monospace,
+    monospace;
+}
+.workspace {
+  display: grid;
+  /* 显式约束唯一一行；auto 行的内容尺寸不能突破剩余视口高度。 */
+  grid-template-rows: minmax(0, 1fr);
+  /* 正文是主画布；讨论与反馈集中到右侧，阅读后可立即提交意见。 */
+  grid-template-columns: minmax(0, 1.7fr) minmax(320px, 0.8fr);
+  grid-template-areas: "document conversation";
+  gap: 24px;
+  align-items: stretch;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+/* 页面只滚动到这里；阶段条和两栏工作台作为一个整体吸附在顶部。 */
+.workspace-shell {
+  /* 最后一个区块恰好一屏高，外层滚动自然止于阶段条，不再需要 sticky。 */
+  height: 100dvh;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.conversation {
+  min-width: 0;
+}
+.document-canvas {
+  grid-area: document;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* 工作区整体固定后，右侧只让对话历史滚动，反馈输入始终保留在底部。 */
+.feedback-rail {
+  grid-area: conversation;
+  position: static;
+  min-height: 0;
+  max-height: none;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* 每栏只保留一个主滚动区；不常驻空滚动条，也不把滚轮传给外层页面。 */
+.document-scroll, .conversation-scroll {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+.document-canvas > .document-heading,
+.document-canvas > .document-footer,
+.feedback-rail > .composer { flex: 0 0 auto; }
+.document-canvas > .document-footer { position: static; padding: 12px 20px; gap: 8px; }
+.document-footer p { margin-bottom: 0; }
+.feedback-rail > .composer { margin-top: 8px; }
+.feedback-rail > .composer textarea { resize: none; }
+.feedback-rail .conversation-scroll .messages,
+.feedback-rail .conversation-scroll .material,
+.feedback-rail .conversation-scroll .thinking-process,
+.feedback-rail .conversation-scroll .thinking-content { max-height: none; overflow-y: visible; }
+/* 编辑器跟随内容增长，滚动统一交给 document-scroll；也覆盖候选和历史编辑器。 */
+.document-canvas .document-scroll .material-analysis-editor {
+  height: auto;
+  min-height: 240px;
+  max-height: none;
+  overflow: visible;
+}
+.document-scroll .material-analysis-editor .mdxeditor-root-contenteditable,
+.document-scroll .material-analysis-editor .mdxeditor-contenteditable-wrapper {
+  height: auto;
+  flex: 0 0 auto;
+  overflow: visible;
+}
+.material {
+  background: #e8edf5;
+  padding: 18px;
+  border-radius: 9px;
+}
+/* 材料展开时也限制在轨道内滚动，不能挤掉底部的反馈入口。 */
+.feedback-rail .material {
+  max-height: min(300px, 34vh);
+  overflow-y: auto;
+}
+summary {
+  cursor: pointer;
+  line-height: 1.8;
+}
+.material summary {
+  font-weight: 600;
+}
+.material summary span {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-left: 8px;
+}
+.material label {
+  margin-top: 15px;
+}
+.material-input-tabs {
+  display: flex;
+  gap: 4px;
+  margin-top: 14px;
+  padding-bottom: 1px;
+  border-bottom: 1px solid #cbd5e3;
+}
+.material-input-tabs button {
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 5px 5px 0 0;
+  padding: 8px 10px 7px;
+  color: var(--muted);
+  background: transparent;
+}
+.material-input-tabs button[aria-selected="true"] {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+.material-input-tabs button:hover:not(:disabled) {
+  border-color: transparent transparent var(--accent);
+  color: var(--accent);
+}
+.material-input-tabs + [role="tabpanel"] {
+  min-height: 174px;
+}
+.material .hint {
+  margin: 10px 0;
+}
+.file-label {
+  font-size: 12px;
+}
+.file-label input {
+  max-width: 100%;
+  font-size: 12px;
+}
+.discussion-heading {
+  margin: 25px 0 15px;
+}
+.messages {
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+.empty-chat {
+  padding: 20px 10px;
+  color: var(--muted);
+}
+/* 思考内容单独滚动，沿用工作台配色，避免长推理撑开正文布局。 */
+.thinking-process {
+  margin: 12px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--muted);
+}
+.feedback-rail .thinking-process {
+  max-height: 180px;
+  overflow-y: auto;
+}
+.thinking-process summary {
+  cursor: pointer;
+  color: var(--ink);
+}
+.thinking-process summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.thinking-content {
+  margin-top: 10px;
+  /* 外层 thinking-process 是唯一滚动容器，避免流式输出时内外滚动条不同步。 */
+  max-height: none;
+  overflow: visible;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.75;
+}
+.empty-chat h3 {
+  color: var(--ink);
+  font:
+    22px "Songti SC",
+    SimSun,
+    serif;
+}
+.message {
+  padding: 13px 15px;
+  margin-bottom: 12px;
+  background: white;
+  border-radius: 8px;
+}
+.message.user {
+  background: #e1e9fa;
+}
+.message-label {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.message p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+.message details {
+  font-size: 13px;
+}
+.composer {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  background: var(--canvas);
+}
+.composer button {
+  justify-self: end;
+}
+.document {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  min-width: 0;
+  box-shadow: 0 8px 30px #202d4305;
+}
+.document-heading {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.document-heading p {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+}
+.document-heading h2 { margin-bottom: 3px; }
+.document-heading-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.document-heading-actions button {
+  flex-shrink: 0;
+}
+.document-editor {
+  width: 100%;
+  min-height: 490px;
+  border: 0;
+  border-radius: 0;
+  padding: 28px;
+  font-size: 15px;
+  line-height: 1.95;
+}
+.mdxeditor.material-analysis-editor {
+  /* MDXEditor 会把 className 同时复制到 body 下的弹层；尺寸与背景只作用于编辑器本体。 */
+  /* 固定编辑区域高度；滚动交给 MDXEditor 的内容根节点，避免长文被外层裁掉。 */
+  height: clamp(420px, calc(100vh - 250px), 720px);
+  min-height: 420px;
+  border: 0;
+  border-radius: 0;
+  background: var(--paper);
+  --accentColor: var(--accent);
+  overflow: hidden;
+}
+.material-analysis-editor .mdxeditor-root-contenteditable {
+  /* 补齐 flex 高度链，确保超出视口的 Markdown 产生纵向滚动。 */
+  height: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+.material-analysis-editor .mdxeditor-contenteditable-wrapper {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.material-analysis-editor [role="toolbar"] {
+  border-bottom: 1px solid var(--line);
+  background: #f8faff;
+  padding: 8px 16px;
+}
+.material-analysis-content {
+  min-height: 0;
+  padding: 24px 28px;
+  font-size: 15px;
+  line-height: 1.95;
+}
+.material-analysis-content h1,
+.material-analysis-content h2,
+.material-analysis-content h3 {
+  color: var(--ink);
+  line-height: 1.4;
+}
+.material-analysis-content blockquote {
+  border-left-color: var(--accent);
+  color: var(--muted);
+}
+.material-analysis-content table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.editor-loading {
+  color: var(--muted);
+}
+.document-footer {
+  /* 内容滚动时保持确认操作可见，避免按钮被长篇解读推到屏幕外。 */
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  padding: 20px 24px;
+  border-top: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 96%, transparent);
+  box-shadow: 0 -8px 18px #202d4308;
+  display: grid;
+  gap: 14px;
+}
+/* 第二步在一个页面完成选题：候选探索与本篇确认通过 Tab 分开。 */
+.topic-direction-workspace {
+  display: grid;
+  gap: 20px;
+  padding: 0 24px 24px;
+}
+.topic-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--line);
+}
+.topic-tabs button {
+  position: relative;
+  padding: 11px 14px;
+  border: 0;
+  border-radius: 8px 8px 0 0;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+}
+.topic-tabs button:hover:not(:disabled) { color: var(--ink); background: var(--canvas); }
+.topic-tabs button[aria-selected="true"] {
+  color: var(--accent);
+  background: var(--canvas);
+}
+.topic-tabs button[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  bottom: -1px;
+  left: 10px;
+  height: 2px;
+  background: var(--accent);
+}
+.topic-tabs button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -3px;
+}
+.topic-tab-panel {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.topic-candidates {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.topic-candidates > summary {
+  padding: 14px 16px;
+  cursor: pointer;
+  background: var(--canvas);
+  font-weight: 600;
+}
+.topic-candidates > summary span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+  margin-left: 8px;
+}
+.topic-candidates > summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -3px;
+}
+.candidate-actions, .direction-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.candidate-actions { padding: 12px 16px; }
+.candidate-actions p { flex: 1 1 180px; margin: 0; }
+.topic-candidates .document-editor { min-height: 180px; max-height: 340px; overflow-y: auto; }
+/* 富文本候选区也限制高度，避免完整选题稿挤走标题与方向输入。 */
+.topic-candidates .material-analysis-editor { min-height: 180px; max-height: 340px; overflow-y: auto; }
+.topic-decision { display: grid; gap: 14px; padding: 18px 16px 20px; }
+.topic-decision-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.topic-direction-editor { display: grid; gap: 10px; }
+.topic-decision h3, .topic-decision p { margin: 0; }
+.direction-heading > span { color: var(--muted); font-size: 13px; }
+.topic-decision .direction-length-warning { color: #9a5917; }
+/* 候选、整理方向、确认推进用灰蓝、浅靛蓝、实色靛蓝区分操作层级。 */
+button.topic-action { font-weight: 600; }
+button.topic-action-muted {
+  background: #f5f7fb;
+  border-color: #d6deeb;
+  color: #4d5e77;
+}
+button.topic-action-muted:hover:not(:disabled) {
+  background: #e9eef7;
+  border-color: #aabbd5;
+  color: #304969;
+}
+button.topic-action-secondary {
+  background: #eaf0ff;
+  border-color: #bfcef2;
+  color: #2d4fa7;
+}
+button.topic-action-secondary:hover:not(:disabled) {
+  background: #dce6ff;
+  border-color: #8ea8e2;
+  color: #233f89;
+}
+button.topic-action-confirm {
+  background: #345bc6;
+  border-color: #345bc6;
+  color: #fff;
+}
+button.topic-action:disabled {
+  background: #eef1f6;
+  border-color: #dfe5ee;
+  color: #8994a7;
+  opacity: 1;
+}
+.document-footer p {
+  color: var(--muted);
+  margin: 0;
+}
+.document-footer > button {
+  justify-self: end;
+}
+/* 成稿与配图查看共享固定操作区，查看不会触发保存或成稿。 */
+.document-final-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; }
+.image-prompt-dialog { width: min(900px, calc(100vw - 32px)); max-height: min(820px, calc(100vh - 32px)); border: 1px solid var(--line); border-radius: 12px; padding: 0; color: var(--ink); background: var(--paper); box-shadow: 0 24px 64px #202d4340; }
+.image-prompt-dialog::backdrop { background: #202d4366; }
+.image-prompt-dialog > header, .image-prompt-dialog > footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 22px; }
+.image-prompt-dialog > header { border-bottom: 1px solid var(--line); background: #f8fbf7; }
+.image-prompt-dialog h2, .image-prompt-dialog p { margin: 0; }
+.image-prompt-dialog > p { padding: 16px 22px 0; color: var(--muted); }
+.image-prompt-eyebrow { color: #587146; font-size: 12px; font-weight: 700; letter-spacing: .08em; }
+/* 预览保留 Markdown 原貌；纸色顶栏对应本次手绘配图的自然主题。 */
+.image-prompt-dialog pre { max-height: min(55vh, 560px); margin: 16px 22px; padding: 16px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; border: 1px solid #dce5d7; border-radius: 8px; background: #fcfdfb; font: 13px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.image-prompt-dialog > footer { border-top: 1px solid var(--line); }
+.image-prompt-dialog > footer p { color: #39714d; font-size: 13px; }
+.image-prompt-dialog > footer .image-prompt-error { color: #a13232; }
+@media (max-width: 520px) { .image-prompt-dialog > header, .image-prompt-dialog > footer { padding: 14px 16px; } .image-prompt-dialog > p { padding: 14px 16px 0; } .image-prompt-dialog pre { margin: 14px 16px; max-height: 52vh; } }
+.loading {
+  padding: 50px;
+  color: var(--muted);
+}
+/* 小屏幕按材料、讨论、成果顺序排列，保留完整编辑能力。 */
+@media (max-width: 850px) {
+  main {
+    padding: 20px 16px;
+  }
+  .workspace-page { height: auto; overflow-y: visible; padding-bottom: calc(82px + env(safe-area-inset-bottom)); }
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .project-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .app-navigation { width: 100%; overflow-x: auto; padding-bottom: 2px; }
+  .project-group { padding: 18px; }
+  .project-group > header, .project-group li { align-items: flex-start; flex-direction: column; }
+  .project-row-actions { width: 100%; justify-content: flex-end; }
+  .workspace { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; grid-template-areas: "document"; position: static; height: auto; }
+  .workspace-shell { position: static; display: block; height: auto; overflow: visible; }
+  .document-scroll, .conversation-scroll { flex: none; overflow-y: visible; }
+  /* 窄屏恢复页面自然滚动，不让固定侧栏压缩输入与编辑区域。 */
+  .feedback-rail {
+    position: static;
+    height: auto;
+    max-height: none;
+    display: block;
+    overflow: visible;
+  }
+  .document-canvas { height: auto; overflow-y: visible; }
+  /* 手机只显示一个工作面板；隐藏不会卸载组件，因此未保存内容和流式状态不丢失。 */
+  .workspace.mobile-document { grid-template-areas: "document"; }
+  .workspace.mobile-document .feedback-rail, .workspace.mobile-conversation .document-canvas { display: none; }
+  .workspace.mobile-conversation { grid-template-areas: "conversation"; }
+  .workspace.mobile-conversation .feedback-rail { display: block; }
+  .feedback-rail .messages {
+    max-height: 360px;
+  }
+  .feedback-rail .material {
+    max-height: none;
+    overflow: visible;
+  }
+  .feedback-rail .thinking-process {
+    max-height: none;
+    overflow: visible;
+  }
+  .steps button {
+    padding: 12px 10px;
+  }
+  .steps span {
+    margin-right: 6px;
+  }
+  .document-heading {
+    padding: 18px;
+    flex-wrap: wrap;
+  }
+  .document-editor {
+    min-height: 380px;
+    padding: 18px;
+  }
+  .material-analysis-content {
+    min-height: 320px;
+    padding: 18px;
+  }
+  .mdxeditor.material-analysis-editor {
+    height: clamp(380px, 65vh, 560px);
+    min-height: 380px;
+  }
+  .save-state {
+    max-width: 35%;
+  }
+  .steps { position: sticky; top: 0; z-index: 10; margin-left: -16px; margin-right: -16px; padding-left: 16px; padding-right: 16px; }
+  .mobile-workspace-tabs { position: fixed; z-index: 30; right: 0; bottom: 0; left: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: color-mix(in srgb, var(--paper) 96%, transparent); box-shadow: 0 -8px 22px #202d4312; }
+  .mobile-workspace-tabs button { min-height: 44px; padding: 10px; }
+  .mobile-workspace-tabs button.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+  /* 底部视图切换条始终占位，阶段确认和反馈发送不能被它遮住。 */
+  .document-footer { bottom: calc(64px + env(safe-area-inset-bottom)); padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+  .feedback-rail > .composer { position: sticky; z-index: 8; bottom: calc(64px + env(safe-area-inset-bottom)); padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+  .document-final-actions, .document-heading-actions { width: 100%; }
+  .document-final-actions > button, .document-heading-actions > button { flex: 1 1 140px; min-height: 44px; }
+  .composer button { min-height: 44px; }
+  .article-versions, .article-outline-reference { width: calc(100% - 36px); }
+  .article-outline-reference > div, .article-versions-content { min-width: 0; }
+}
+
+@media (min-width: 851px) { .mobile-workspace-tabs { display: none; } }
+
+/* 登录页保持与文章纸面一致，窄屏优先使用完整宽度与足够大的触控目标。 */
+.login-page { min-height: 100dvh; display: grid; place-items: center; padding: 24px; background: var(--canvas); }
+.login-card { width: min(100%, 420px); display: grid; gap: 18px; padding: 30px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); box-shadow: 0 16px 42px #202d4314; }
+.login-card h1 { margin: 0; font: 600 32px/1.25 "Songti SC", "Noto Serif CJK SC", serif; }
+.login-eyebrow { margin: 0; color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: .1em; }
+.login-hint { margin: -8px 0 0; color: var(--muted); }
+.login-card input, .login-card button { min-height: 46px; }
+.login-error { margin: 0; padding: 10px 12px; border-radius: 7px; background: #fff0ef; color: #8e3030; }
+
+/* 登录记录为管理页补充横向滚动容器，长 User-Agent 不会撑破手机宽度。 */
+.security-panel { padding: 22px 24px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
+.security-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.security-heading p { color: var(--muted); }
+.security-table-scroll { overflow-x: auto; }
+.security-table-scroll table { width: 100%; min-width: 720px; border-collapse: collapse; }
+.security-table-scroll th, .security-table-scroll td { padding: 11px 10px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .login-page { padding: 16px; }.login-card { padding: 24px 20px; }.security-panel { padding: 18px; }.security-heading { flex-direction: column; }.security-heading button { width: 100%; min-height: 44px; } }
+
+/* 版本区沿用文档面板样式，只读预览与当前可编辑正文明确分开。 */
+.article-versions,
+.article-outline-reference {
+  align-self: flex-end;
+  width: fit-content;
+  max-width: 100%;
+  margin: 12px 20px 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+}
+.article-versions > summary,
+.article-outline-reference > summary {
+  padding: 8px 12px;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+.article-outline-reference > div {
+  display: grid;
+  gap: 12px;
+  min-width: min(520px, calc(100vw - 96px));
+  max-width: 680px;
+  padding: 14px;
+  border-top: 1px solid var(--line);
+}
+.article-outline-reference > div > p { margin: 0; color: var(--muted); }
+.article-versions-content {
+  display: grid;
+  gap: 14px;
+  min-width: min(520px, calc(100vw - 96px));
+  max-width: 680px;
+  padding: 14px;
+  border-top: 1px solid var(--line);
+}
+.article-versions-content label {
+  display: grid;
+  gap: 8px;
+}
+.article-versions-content select { width: 100%; min-width: 0; }
+.version-preview { margin-top: 16px; }
+.version-preview .document-editor { max-height: 420px; overflow: auto; }
+.version-preview > button { margin-top: 12px; }
+
+/* 风格记忆采用折叠面板，长证据独立滚动，不挤占写作区。 */
+.style-memory { margin: 16px 0; border: 1px solid var(--border, #ddd); border-radius: 10px; padding: 12px 16px; }
+.style-memory > summary { cursor: pointer; font-weight: 600; }
+.style-memory-content { display: grid; gap: 12px; padding-top: 12px; max-height: 65vh; overflow: auto; }
+.style-memory-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.style-memory-trend { border-top: 1px solid var(--border, #ddd); padding: 12px 0; }
+.style-memory-trend p { margin: 6px 0; }
+/* 原始修改记录归属到对应倾向，视觉上形成“倾向—证据”的连续阅读路径。 */
+.style-memory-evidence { margin-top: 12px; padding: 12px; border-left: 3px solid var(--accent, #4f46e5); background: #f6f7f8; }
+.style-memory-evidence h3 { margin: 0 0 8px; font-size: 14px; }
+.style-memory-evidence details { margin-top: 8px; }
+.style-memory pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 240px; overflow: auto; font: inherit; background: #f6f7f8; padding: 12px; }
+.style-memory textarea, .style-memory select { width: 100%; }
+.style-memory [role="alert"] { color: #a13232; }
+
+/* 概览页沿用写作台的纸面与靛蓝；四步横向轨道直接表达阶段顺序。 */
+.overview-link, .overview-header a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.overview-link:hover, .overview-header a:hover { text-decoration: underline; }
+.overview-link:focus-visible, .overview-header a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.overview-page { max-width: 1160px; }
+.overview-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
+.overview-header h1 { font: 600 clamp(30px, 4vw, 48px)/1.2 "Songti SC", "Noto Serif CJK SC", serif; margin-bottom: 10px; }
+.overview-header p { color: var(--muted); margin-bottom: 0; }
+.overview-eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+.overview-header a { white-space: nowrap; padding-top: 10px; }
+.overview-section { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 26px; margin-bottom: 18px; }
+.overview-section > h2 { font-size: 19px; margin-bottom: 16px; }
+.overview-section > p { color: var(--muted); }
+.overview-flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; padding: 0; margin: 0 0 18px; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+.overview-flow li { display: grid; align-content: start; gap: 8px; padding: 18px; border-right: 1px solid var(--line); min-height: 135px; }
+.overview-flow li:last-child { border-right: 0; }
+.overview-flow b { color: var(--accent); font-size: 12px; font-variant-numeric: tabular-nums; }
+.overview-flow strong { font-size: 16px; }
+.overview-flow span { color: var(--muted); line-height: 1.55; }
+.overview-dataflow { border-top: 1px solid var(--line); padding-top: 18px; margin-bottom: 0; }
+.overview-topics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.overview-topic { min-width: 0; border: 1px solid var(--line); border-radius: 9px; padding: 20px; }
+.overview-topic-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.overview-topic-heading h3 { font-size: 19px; margin-bottom: 14px; }
+.overview-topic-heading span, .overview-detail, .overview-sample, .overview-empty { color: var(--muted); font-size: 12px; }
+.overview-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 0 0 12px; }
+.overview-metrics div { background: var(--canvas); border-radius: 6px; padding: 12px; }
+.overview-metrics dt { color: var(--muted); font-size: 12px; }
+.overview-metrics dd { margin: 4px 0 0; font-size: 23px; font-variant-numeric: tabular-nums; }
+.overview-detail { margin-bottom: 18px; }
+.overview-evaluation { border-top: 1px solid var(--line); padding-top: 16px; }
+.overview-evaluation p { margin: 7px 0; }
+.overview-articles { list-style: none; padding: 0; margin: 16px 0 0; border-top: 1px solid var(--line); }
+.overview-articles li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 4px 10px; padding: 10px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+.overview-articles li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.overview-articles li small, .overview-articles li em { color: var(--muted); font-size: 12px; font-style: normal; }
+.overview-articles li em { grid-column: 1 / -1; }
+.overview-articles li b { white-space: nowrap; font-weight: 500; }
+@media (max-width: 850px) {
+  .overview-header { flex-direction: column; }
+  .overview-topics { grid-template-columns: 1fr; }
+  .overview-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .overview-flow li:nth-child(2) { border-right: 0; }
+  .overview-flow li:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+}
+@media (max-width: 520px) {
+  .overview-section { padding: 18px; }
+  .overview-flow { grid-template-columns: 1fr; }
+  .overview-flow li { border-right: 0; border-bottom: 1px solid var(--line); min-height: 0; }
+  .overview-flow li:last-child { border-bottom: 0; }
+}
+
+/* 效果说明单独占行，长偏好与小屏展示沿用概览既有层级。 */
+.overview-article-effect { grid-column: 1 / -1; }
+.overview-learning { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 12px; }
+.overview-learning summary { cursor: pointer; font-weight: 600; }
+.overview-learning p { margin: 8px 0; overflow-wrap: anywhere; }
+.overview-learning > div { padding: 10px 0; border-bottom: 1px solid var(--line); }
+/* 概览以统计为主；展开后才显示带增删标记的原始修改，避免干扰浏览节奏。 */
+.overview-evidence-control { margin-top: 8px; }
+.overview-evidence-control [role="alert"] { color: #a13232; }
+.overview-evidence { margin-top: 10px; padding: 12px; border-left: 3px solid var(--accent); background: #f6f7f8; }
+.overview-evidence > details { margin-top: 12px; }
+.overview-evidence pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 240px; overflow: auto; padding: 10px; background: #fff; }
+.overview-evidence-label { margin-bottom: 4px; font-size: 13px; font-weight: 600; }
+.overview-evidence-instruction { padding: 8px 10px; background: #fff; }
+.overview-diff { max-height: 280px; margin: 0; white-space: pre-wrap; overflow: auto; overflow-wrap: anywhere; padding: 10px; background: #fff; font: inherit; }
+.overview-diff ins, .overview-diff-legend ins { background: #d9f3e5; color: #185c3b; text-decoration: none; }
+.overview-diff del, .overview-diff-legend del { margin-left: 8px; background: #fde2e2; color: #9d2525; }
+.overview-diff-legend { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12px; color: #59616b; }
+/* 正文版本历史旁按需展示净变化，避免每次自动保存都占用编辑区。 */
+.manual-edit-history { margin-top: 12px; }
+.manual-edit-history [role="alert"] { color: #a13232; }
+.manual-edit-history-content { margin-top: 10px; padding: 12px; border-left: 3px solid var(--accent); background: #f6f7f8; }
+.manual-edit-history-content > details { margin-top: 12px; }
+.manual-edit-history-content pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 240px; overflow: auto; padding: 10px; background: #fff; }
+
+/* 微信工具保持阅读优先：样式预览隔离，统计用留白区分信息。 */
+.overview-tabs { display:flex; gap:8px; margin:24px 0; border-bottom:1px solid #dce3df; }
+.overview-tabs a { padding:12px 20px; color:inherit; text-decoration:none; border-bottom:3px solid transparent; }
+.overview-tabs a[aria-current="page"] { color:#286653; border-color:#286653; font-weight:600; }
+.wx-layout-dialog { width:min(880px,94vw); max-height:92vh; border:1px solid #dce3df; border-radius:14px; padding:24px; background:#fff; color:#333; }
+.wx-layout-dialog::backdrop { background:rgb(20 30 25 / 45%); }
+.wx-layout-dialog header,.wx-layout-dialog footer,.wx-statistics-heading,.wx-chart-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.wx-layout-dialog header h2,.wx-statistics h2 { margin:0 0 8px; }
+.wx-layout-dialog p,.wx-statistics p { line-height:1.7; }
+.wx-layout-controls,.wx-statistics-controls { display:flex; gap:14px; flex-wrap:wrap; align-items:end; margin:20px 0; }
+.wx-layout-controls label,.wx-statistics-controls label { display:flex; flex-direction:column; gap:6px; }
+.wx-layout-controls label:last-child { flex:1; min-width:200px; }
+.wx-layout-dialog input,.wx-layout-dialog select,.wx-statistics input,.wx-statistics select { border:1px solid #cdd8d1; border-radius:6px; padding:8px 10px; background:#fff; color:#333; min-height:38px; }
+.wx-phone-preview { width:min(100%,420px); margin:20px auto; border:1px solid #e1e6e3; background:#fff; }
+.wx-phone-preview h1 { padding:20px 16px 0; margin:0; font-size:24px; line-height:1.5; overflow-wrap:anywhere; }
+.wx-phone-preview iframe { display:block; width:100%; height:54vh; border:0; }
+.wx-layout-dialog footer { position:sticky; bottom:-24px; background:#fff; padding:16px 0; justify-content:flex-end; border-top:1px solid #e1e6e3; }
+.wx-error { color:#a12f29; }
+.wx-push-result { margin:18px 0; padding:12px 16px; border:1px solid #cdd8d1; border-radius:8px; background:#f4f7f5; }
+.wx-push-result strong { display:block; color:#1f5e4d; }.wx-push-result p { margin:4px 0 0; }.wx-push-result-error { border-color:#e4bbb7; background:#fff4f3; }.wx-push-result-error strong { color:#a12f29; }
+.wx-push-result-pending { border-color:#c6d5e3; background:#f3f8fc; }.wx-push-result-pending strong { color:#245b83; }.wx-push-media-id { color:#56625c; font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; overflow-wrap:anywhere; }
+.wx-sync-status { background:#f4f7f5; padding:12px 16px; border-radius:8px; margin:18px 0; font-size:13px; }
+.wx-sync-status p { margin:4px 0; }
+/* 单接口无权限不等同于整次同步失败，使用提示色保留可用数据的语义。 */
+.wx-source-unavailable { color:#7a5b16; }
+.wx-period,.wx-statistics-note { color:#626e67; font-size:13px; }
+.wx-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin:22px 0; }
+.wx-metrics>div { padding:16px 0; border-top:1px solid #dce3df; }
+.wx-metrics span,.wx-metrics strong,.wx-metrics small { display:block; }
+.wx-metrics span { color:#546459; font-size:13px; }.wx-metrics strong { font-size:30px; font-variant-numeric:tabular-nums; margin:8px 0; }.wx-metrics small { color:#6b746e; }
+.wx-statistics-summary { padding-left:16px; border-left:3px solid #286653; }
+.wx-chart-heading { margin:26px 0 8px; flex-wrap:wrap; }.wx-chart-heading h3 { margin:0; }.wx-chart-heading span { color:#626e67; font-size:12px; }
+.wx-trend-chart { width:100%; display:block; margin:12px 0; }.wx-chart-table { margin-bottom:24px; }.wx-chart-table summary { cursor:pointer; }
+.wx-chart-table table,.wx-articles-table { width:100%; border-collapse:collapse; font-size:14px; }
+.wx-statistics th,.wx-statistics td { padding:12px 10px; border-bottom:1px solid #e4e9e6; text-align:left; }
+.wx-articles-table td:first-child { min-width:180px; max-width:420px; }.wx-table-scroll { overflow-x:auto; }
+.wx-cumulative dl { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }.wx-cumulative dt { font-size:13px; color:#626e67; }.wx-cumulative dd { margin:6px 0; font-size:20px; }
+.wx-pagination { display:flex; gap:16px; align-items:center; justify-content:center; margin-top:16px; }
+@media(max-width:650px) { .wx-layout-dialog { padding:16px; }.wx-statistics-heading { align-items:flex-start; flex-direction:column; }.wx-metrics,.wx-cumulative dl { grid-template-columns:repeat(2,minmax(0,1fr)); }.overview-tabs a { padding:10px 12px; }.wx-layout-dialog header { align-items:flex-start; }.wx-layout-dialog footer { bottom:-16px; } }

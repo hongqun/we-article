@@ -1,0 +1,14 @@
+{
+  "name": "见隙",
+  "description": "面向职场打工人的职场与个人成长公众号，关注困境中的判断、自我边界和可采取的行动。",
+  "audience": "普通职场打工人，以及在工作、关系与个人成长中寻找方向的读者",
+  "outlineLabel": "三段思路",
+  "directionLabel": "用一句核心判断定住方向",
+  "default": true,
+  "structure": "一个标题加三个自然段，不加章节小标题。三段分别承担提出困境或鲜明判断、解释原因并转换视角、落到可采取的行动与自我边界。",
+  "paragraphLength": { "min": 100, "max": 150 },
+  "workflow": "staged",
+  "styleMemory": true,
+  "writingSkill": "human-writing",
+  "directionLength": { "min": 40, "max": 80 }
+}

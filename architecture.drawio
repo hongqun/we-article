@@ -1,0 +1,47 @@
+<mxfile host="app.diagrams.net" agent="Codex" version="24.7.17" type="device">
+  <diagram id="we-article-workflow" name="写作流程">
+    <mxGraphModel dx="1440" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1440" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="We-Article 写作流程" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=none;fillColor=none;fontColor=#263B32;fontSize=28;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="54" width="640" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="subtitle" value="从材料到成文，AI 协助推进每个阶段，并通过风格学习贴近作者表达。" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=none;fillColor=none;fontColor=#62746B;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="82" y="108" width="1000" height="32" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="stage1" value="&lt;div style=&quot;font-size:13px;font-weight:700;color:#527560;letter-spacing:1px;margin-bottom:12px&quot;&gt;01&lt;/div&gt;&lt;div style=&quot;font-size:19px;font-weight:700;margin-bottom:9px&quot;&gt;材料解读&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.6;color:#52645A&quot;&gt;理解素材内容与核心信息&lt;/div&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#EAF3ED;strokeColor=#779782;strokeWidth=2;fontColor=#263B32;align=center;verticalAlign=middle;spacing=16;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="235" width="260" height="165" as="geometry"/>
+        </mxCell>
+        <mxCell id="stage2" value="&lt;div style=&quot;font-size:13px;font-weight:700;color:#527560;letter-spacing:1px;margin-bottom:12px&quot;&gt;02&lt;/div&gt;&lt;div style=&quot;font-size:19px;font-weight:700;margin-bottom:9px&quot;&gt;选题与方向&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.6;color:#52645A&quot;&gt;明确主题和文章切入点&lt;/div&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#EAF3ED;strokeColor=#779782;strokeWidth=2;fontColor=#263B32;align=center;verticalAlign=middle;spacing=16;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="410" y="235" width="260" height="165" as="geometry"/>
+        </mxCell>
+        <mxCell id="stage3" value="&lt;div style=&quot;font-size:13px;font-weight:700;color:#527560;letter-spacing:1px;margin-bottom:12px&quot;&gt;03&lt;/div&gt;&lt;div style=&quot;font-size:19px;font-weight:700;margin-bottom:9px&quot;&gt;写作大纲&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.6;color:#52645A&quot;&gt;组织结构与论述脉络&lt;/div&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#EAF3ED;strokeColor=#779782;strokeWidth=2;fontColor=#263B32;align=center;verticalAlign=middle;spacing=16;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="740" y="235" width="260" height="165" as="geometry"/>
+        </mxCell>
+        <mxCell id="stage4" value="&lt;div style=&quot;font-size:13px;font-weight:700;color:#527560;letter-spacing:1px;margin-bottom:12px&quot;&gt;04&lt;/div&gt;&lt;div style=&quot;font-size:19px;font-weight:700;margin-bottom:9px&quot;&gt;文章正文&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.6;color:#52645A&quot;&gt;完成文章撰写与修订&lt;/div&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#EAF3ED;strokeColor=#779782;strokeWidth=2;fontColor=#263B32;align=center;verticalAlign=middle;spacing=16;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="235" width="260" height="165" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#82958B;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="stage1" target="stage2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge23" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#82958B;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="stage2" target="stage3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge34" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#82958B;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="stage3" target="stage4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ai" value="&lt;div style=&quot;font-size:17px;font-weight:700;margin-bottom:8px&quot;&gt;AI 驱动&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.7;color:#465B50&quot;&gt;AI 协助分析材料、探索选题、整理大纲和撰写正文，贯穿四个阶段。&lt;/div&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#EAF0F7;strokeColor=#8296AD;strokeWidth=1.5;fontColor=#2D3C50;align=left;verticalAlign=middle;spacingLeft=22;spacingRight=22;spacingTop=16;spacingBottom=16;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="190" y="520" width="470" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="style-learning" value="&lt;div style=&quot;font-size:17px;font-weight:700;margin-bottom:8px&quot;&gt;风格学习&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.7;color:#52604A&quot;&gt;从用户对文章的实际修改中归纳写作偏好，供后续写作参考。&lt;/div&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#F5F0E5;strokeColor=#A08C62;strokeWidth=1.5;fontColor=#493F2C;align=left;verticalAlign=middle;spacingLeft=22;spacingRight=22;spacingTop=16;spacingBottom=16;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="740" y="520" width="470" height="150" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
