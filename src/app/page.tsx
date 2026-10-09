@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type SetStateAction } from "react";
+import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import WechatLayout from "./WechatLayout";
@@ -599,9 +600,9 @@ export default function Home() {
     <main className="workspace-page">
       <header className="topbar">
         <div className="brand">
-          <span className="brand-mark">文</span>
+          <Image className="brand-mark" src="/logo-mark.svg" alt="" width={46} height={46} priority />
           <div>
-            <h1>文章工作台</h1>
+            <h1>We-Article</h1>
             <p>读懂材料，找到值得写的角度。</p>
           </div>
         </div>

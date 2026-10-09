@@ -143,17 +143,9 @@ p {
   font-size: 12px;
 }
 .brand-mark {
-  width: 42px;
+  width: 46px;
   height: 46px;
-  display: grid;
-  place-items: center;
-  background: var(--ink);
-  color: white;
-  border-radius: 5px 14px 5px 5px;
-  font:
-    26px "Songti SC",
-    SimSun,
-    serif;
+  flex: 0 0 auto;
 }
 .project-actions select {
   max-width: 230px;

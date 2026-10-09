@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 286 64" fill="none">
+  <path d="M14 5h23l14 14v34a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6V11a6 6 0 0 1 6-6Z" fill="#202D43"/>
+  <path d="M37 6v9a5 5 0 0 0 5 5h9" fill="#4775F5"/>
+  <path d="M37 6v9a5 5 0 0 0 5 5h9" stroke="#A8BEFF" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M19 27h4v5h-5l1.5-2.5H19V27Zm7 0h4v5h-5l1.5-2.5H26V27Z" fill="#FF825E"/>
+  <path d="M35 29h10M19 37h26M19 44h19" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M19 50h11" stroke="#A8BEFF" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M33 47v6" stroke="#FF825E" stroke-width="2" stroke-linecap="round"/>
+  <text x="68" y="42" fill="#202D43" font-family="Inter, 'Avenir Next', Arial, sans-serif" font-size="28" font-weight="650" letter-spacing="-1.2">We</text>
+  <circle cx="115" cy="31" r="2.5" fill="#FF825E"/>
+  <text x="121" y="42" fill="#4775F5" font-family="Inter, 'Avenir Next', Arial, sans-serif" font-size="28" font-weight="550" letter-spacing="-0.7">Article</text>
+</svg>

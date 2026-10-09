@@ -6,6 +6,7 @@ import AuthGate from "./AuthGate";
 export const metadata: Metadata = {
   title: "文章工作台",
   description: "从材料解读到写作大纲",
+  icons: { icon: "/logo-mark.svg" },
 };
 export default function RootLayout({
   children,

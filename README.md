@@ -1,5 +1,9 @@
 # We-Article
 
+<p align="center">
+  <img src="./public/logo.svg" alt="We-Article 标志" width="286">
+</p>
+
 We-Article 是一个微信公众号文章生成工作台。它把写作分成四个阶段：材料解读、选题与方向、写作大纲、文章正文。
 
 生成的文章支持一键排版并推送到公众号草稿箱。
