@@ -392,6 +392,12 @@ summary {
 .material .hint {
   margin: 10px 0;
 }
+/* 材料解读操作紧跟材料输入区，便于输入后立即生成。 */
+.material-analysis-action {
+  display: flex;
+  justify-content: flex-end;
+  margin: 10px 0 18px;
+}
 .file-label {
   font-size: 12px;
 }

@@ -683,7 +683,7 @@ export default function Home() {
           <div className="conversation-scroll">
           <details
             className="material"
-            open={!hasMaterial || !project.results.analysis}
+            open={!hasMaterial || !project.results.analysis || project.stage === "analysis"}
           >
             <summary>
               原始材料{" "}
@@ -730,6 +730,23 @@ export default function Home() {
               </label>
             </div>}
           </details>
+          {project.stage === "analysis" && (
+            <div className="material-analysis-action">
+              <button
+                type="button"
+                className="primary"
+                disabled={busy || !canGenerate}
+                onClick={() =>
+                  void generate(
+                    `请${result ? "重新整理" : "生成"}完整的${labels[project.stage]}。`,
+                    project, dirty, "stage", "button",
+                  )
+                }
+              >
+                {result ? "重新生成材料解读" : "生成材料解读"}
+              </button>
+            </div>
+          )}
           <div className="discussion-heading">
             <h2>一起推敲</h2>
             <span>{labels[project.stage]}</span>
@@ -819,7 +836,7 @@ export default function Home() {
               >
                 复制 Markdown
               </button>}
-              {!isTopicDirection && <button
+              {project.stage !== "analysis" && !isTopicDirection && <button
                 disabled={busy || !canGenerate}
                 onClick={() =>
                   void generate(
