@@ -94,10 +94,14 @@ export function formatArticle(markdown: string, fallbackTitle: string, theme: La
   // 视觉提示词以加粗字段名和正文成组出现，并非代码块；只在模板章节中识别完整的六组结构。
   const templateLabels = ["画面目标", "构图与视角", "空间布局", "色彩", "光影与材质", "避免"];
   let inTemplate = false;
+  let inPrompt = false;
   const body: string[] = [];
   for (let index = 0; index < nodes.length; index++) {
     const node = nodes[index];
-    if (node.type === "heading") inTemplate = /模板/.test(plain(node));
+    if (node.type === "heading") {
+      inTemplate = /模板/.test(plain(node));
+      inPrompt = /提示词/.test(plain(node));
+    }
     const templateNodes = nodes.slice(index, index + templateLabels.length * 2);
     const isTemplate = inTemplate && templateLabels.every((label, offset) => {
       const field = templateNodes[offset * 2], value = templateNodes[offset * 2 + 1];
@@ -109,6 +113,12 @@ export function formatArticle(markdown: string, fallbackTitle: string, theme: La
       // 外框样式随导出 HTML 一起复制；范围只包含模板，保留配图说明和结尾的位置。
       body.push(`<section style="margin:22px 0;padding:16px;border:2px solid ${color.templateBorder};border-radius:8px;background-color:${color.soft};color:#333333;font-size:16px;line-height:30px;">${templateNodes.map(render).join("")}</section>`);
       index += templateNodes.length - 1;
+    } else if (inPrompt && node.type !== "heading") {
+      // 提示词正文用小一号灰字呈现，标题本身保留常规层级样式。
+      let end = index + 1;
+      while (end < nodes.length && nodes[end].type !== "heading") end++;
+      body.push(`<section style="font-size:14px;line-height:26px;color:#888888;">${nodes.slice(index, end).map(render).join("")}</section>`);
+      index = end - 1;
     } else body.push(render(node));
   }
   // 正文保持轻字重，代码区单独恢复正常字重，避免细笔画影响代码辨识。
