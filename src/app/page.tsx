@@ -829,12 +829,51 @@ export default function Home() {
               <p>{isTopicDirection ? "确定一个标题，再聚焦这篇文章的核心方向。" : "可直接编辑，下次讨论会参考你的修改。"}</p>
             </div>
             <div className="document-heading-actions">
+              {project.stage === "analysis" && nextStage && <button
+                type="button"
+                className="primary"
+                disabled={busy || !canConfirm || !currentTopic}
+                onClick={() => void confirmStage()}
+              >
+                确认并进入{labels[nextStage]}
+              </button>}
+              {isTopicDirection && <button
+                type="button"
+                className="primary topic-action topic-action-confirm"
+                disabled={busy || !canConfirm || !currentTopic}
+                onClick={() => void confirmStage()}
+              >
+                确认标题与方向，进入{labels.outline}
+              </button>}
+              {project.stage === "outline" && nextStage && <button
+                type="button"
+                className="primary"
+                disabled={busy || !canConfirm || !currentTopic}
+                onClick={() => void confirmStage()}
+              >
+                确认并进入{labels[nextStage]}
+              </button>}
               {project.stage === "article" && <button
                 type="button"
                 disabled={busy || !result.trim()}
                 onClick={() => void copyArticleMarkdown()}
               >
                 复制 Markdown
+              </button>}
+              {project.stage === "article" && currentTopic?.publish?.enabled && <button
+                type="button"
+                disabled={busy || !project.results.article.trim()}
+                onClick={() => setWechatOpen(true)}
+              >
+                公众号排版
+              </button>}
+              {project.stage === "article" && <button
+                type="button"
+                className="primary"
+                disabled={busy || !canConfirm || !currentTopic}
+                onClick={() => void confirmStage()}
+              >
+                成稿
               </button>}
               {project.stage !== "analysis" && !isTopicDirection && <button
                 disabled={busy || !canGenerate}
@@ -1009,18 +1048,9 @@ export default function Home() {
             )}
             {/* 两套专题的确认入口一致；后续正文必须基于已确认的大纲。 */}
             <div className="document-final-actions">
-              {project.stage === "article" && currentTopic?.publish?.enabled && <button disabled={busy || !project.results.article.trim()} onClick={() => setWechatOpen(true)}>公众号排版</button>}
               {canViewImagePrompt && <button disabled={busy || imagePromptLoading} onClick={() => void showImagePrompt()}>
                 {imagePromptLoading ? "正在组装配图提示词…" : "查看配图提示词"}
               </button>}
-              <button
-                className={isTopicDirection ? "primary topic-action topic-action-confirm" : "primary"}
-                disabled={busy || !canConfirm || !currentTopic}
-                onClick={() => void confirmStage()}
-              >
-                {isTopicDirection ? `确认标题与方向，进入${labels.outline}` :
-                  nextStage ? `确认并进入${labels[nextStage]}` : "成稿"}
-              </button>
             </div>
           </footer>
         </section>
