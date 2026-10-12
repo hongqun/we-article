@@ -47,7 +47,7 @@ export async function runAgent(
   const skills = skillName ? await createSkillAccess([skillName]) : undefined;
   // 阶段策略同时决定提示词能力和实际工具，避免两者出现漂移。
   const agentCapabilities = buildAgentTools({
-    project, stage: project.stage, operation, skills,
+    project, stage: project.stage, operation, instruction, skills,
     onStatus: message => onEvent?.({ type: "status", message }),
   });
   // 入口预读和模型调用共用追踪配置，不修改全局环境变量。

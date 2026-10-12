@@ -5,6 +5,7 @@ import type { Project, Stage } from "./project";
 import { hasCapability, type PromptOperation } from "./prompt-builder";
 import { createArticleReferenceAccess } from "./article-reference";
 import type { createSkillAccess } from "./skills";
+import { formatXiachufangRecipe, readXiachufangRecipe, searchXiachufang } from "./xiachufang";
 
 type SkillAccess = Awaited<ReturnType<typeof createSkillAccess>>;
 
@@ -12,6 +13,7 @@ type ToolFactoryOptions = {
   project: Project;
   stage: Stage;
   operation: PromptOperation;
+  instruction?: string;
   skills?: Pick<SkillAccess, "tool">;
   onStatus?: (message: string) => void;
 };
@@ -21,6 +23,14 @@ export function createReadSourceTool(project: Project) {
     async () => {
       const url = new URL(project.url);
       if (!["http:", "https:"].includes(url.protocol)) throw new Error("仅支持 HTTP/HTTPS 网页。");
+      // 单篇下厨房菜谱只传食材与步骤，避免相关推荐被误识别为本期内容。
+      if (url.hostname === "www.xiachufang.com") {
+        if (url.protocol !== "https:" || !/^\/recipe\/\d+\/?$/.test(url.pathname))
+          throw new Error("下厨房搜索页或合集不能作为单期菜谱，请提供具体菜谱链接或菜品名称。");
+        const recipe = await readXiachufangRecipe(url.href);
+        project.source = formatXiachufangRecipe(recipe);
+        return project.source;
+      }
       const response = await fetch(url, { signal: AbortSignal.timeout(20000) });
       if (!response.ok) throw new Error(`网页读取失败：HTTP ${response.status}，可以粘贴正文继续。`);
       const html = await response.text();
@@ -42,8 +52,23 @@ export function createReadSourceTool(project: Project) {
   );
 }
 
+function createXiachufangTools() {
+  return [
+    tool(async ({ keyword }) => searchXiachufang(keyword), {
+      name: "search_xiachufang",
+      description: "仅在明确制作中国味道图鉴且没有可用单篇菜谱时，按当期菜名查找下厨房候选。返回链接仅供本次选择，不写入材料解读。",
+      schema: z.object({ keyword: z.string().min(1).max(40) }),
+    }),
+    tool(async ({ url }) => formatXiachufangRecipe(await readXiachufangRecipe(url)), {
+      name: "read_xiachufang_recipe",
+      description: "读取搜索结果中选定的一篇下厨房菜谱的食材和步骤。只采用这一版本，不记录作者或链接，不拼接其他菜谱。",
+      schema: z.object({ url: z.url() }),
+    }),
+  ];
+}
+
 // 阶段策略同时决定提示词能力和实际工具，避免“提示词禁用但工具仍可用”。
-export function buildAgentTools({ project, stage, operation, skills, onStatus }: ToolFactoryOptions) {
+export function buildAgentTools({ project, stage, operation, instruction = "", skills, onStatus }: ToolFactoryOptions) {
   const references = hasCapability(stage, "references", operation)
     ? createArticleReferenceAccess(project, message => onStatus?.(message))
     : undefined;
@@ -51,6 +76,9 @@ export function buildAgentTools({ project, stage, operation, skills, onStatus }:
     ...(project.url && hasCapability(stage, "source", operation) ? [createReadSourceTool(project)] : []),
     ...(skills && hasCapability(stage, "writing-skill", operation) ? [skills.tool] : []),
     ...(references ? references.tools : []),
+    // 系列无链接时可在材料解读阶段选一篇真实菜谱；其余阶段只使用已确认的解读。
+    ...(project.topicId === "tech123" && stage === "analysis" &&
+      /中国味道图鉴/.test(`${project.source}\n${instruction}`) ? createXiachufangTools() : []),
   ];
   return {
     tools,
