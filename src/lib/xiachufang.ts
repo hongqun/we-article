@@ -14,6 +14,9 @@ async function fetchHtml(url: string): Promise<string> {
   });
   if (!response.ok) throw new Error(`下厨房页面读取失败：HTTP ${response.status}。请粘贴具体菜谱内容。`);
   const html = await response.text();
+  const finalPath = response.url ? new URL(response.url).pathname : "";
+  if (/humancheck_captcha/i.test(finalPath) || /滑动完成验证|<title[^>]*>\s*滑动验证\s*<\/title>/i.test(html))
+    throw new Error("下厨房要求完成滑动验证，We-Article 无法自动读取。请在浏览器中完成验证并粘贴菜谱内容。");
   if (html.length > 2_000_000) throw new Error("下厨房页面过长，请粘贴具体菜谱内容。");
   return html;
 }
