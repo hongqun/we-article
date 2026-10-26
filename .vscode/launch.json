@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "启动 We-Article 工作台",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

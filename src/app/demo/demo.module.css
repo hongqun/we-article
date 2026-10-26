@@ -1,0 +1,158 @@
+.page {
+  --demo-paper: #fff;
+  --demo-canvas: #eef2f8;
+  --demo-ink: #202d43;
+  --demo-muted: #68768b;
+  --demo-line: #dce3ed;
+  --demo-blue: #345bc6;
+  --demo-blue-soft: #edf2ff;
+  --demo-amber: #a56816;
+  --demo-amber-soft: #fff4df;
+  width: 100%;
+  max-width: 1600px;
+  height: 100dvh;
+  min-height: 560px;
+  margin: 0 auto;
+  padding: 22px 34px 26px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--demo-ink);
+  background:
+    radial-gradient(ellipse at 16% 0%, #fff 0, #fff0 40%),
+    var(--demo-canvas);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.page * { box-sizing: border-box; }
+.page button, .page textarea { font: inherit; }
+.page button:focus-visible, .page a:focus-visible, .page textarea:focus-visible { outline: 3px solid #80a3ff; outline-offset: 3px; }
+
+.header { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex: 0 0 auto; }
+.brand { display: flex; align-items: center; gap: 13px; min-width: 0; }
+.brand img { flex: 0 0 auto; }
+.eyebrow { margin: 0 0 3px; color: var(--demo-muted); font: 600 9px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .16em; }
+.brand h1 { margin: 0; font: 600 20px/1.25 "Songti SC", "Noto Serif CJK SC", Georgia, serif; letter-spacing: .02em; }
+.headerActions { display: flex; align-items: center; gap: 18px; }
+.demoBadge { display: inline-flex; align-items: center; gap: 7px; color: var(--demo-amber); font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+.demoBadge > span { width: 7px; height: 7px; border-radius: 50%; background: #cf8c27; box-shadow: 0 0 0 3px #cf8c271c; }
+.backLink { color: var(--demo-muted); font-size: 12px; text-decoration: none; }
+.backLink:hover { color: var(--demo-blue); }
+.resetButton { min-height: 36px; padding: 7px 12px; border: 1px solid var(--demo-line); border-radius: 6px; background: #ffffffa8; color: var(--demo-ink); font-size: 12px; cursor: pointer; }
+.resetButton:hover { border-color: #b8c7e8; color: var(--demo-blue); }
+
+.contextBar { display: flex; align-items: center; gap: 13px; flex: 0 0 auto; min-height: 64px; margin: 20px 0 16px; padding: 10px 16px; border: 1px solid #d8e1f2; border-radius: 8px; background: #ffffffb8; }
+.contextMark { width: 30px; height: 30px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 5px; background: var(--demo-blue); color: white; font: 600 13px/1 Georgia, serif; }
+.contextCopy { display: grid; gap: 3px; min-width: 0; }
+.contextCopy strong { font-size: 12px; }
+.contextCopy span { overflow: hidden; color: var(--demo-muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.simulationNote { margin: 0 0 0 auto; color: #8a713f; font-size: 10px; text-align: right; }
+
+.workspace { display: grid; grid-template-columns: minmax(300px, .84fr) minmax(0, 1.36fr); gap: 16px; flex: 1 1 auto; min-height: 0; }
+.conversation, .articlePanel { min-width: 0; min-height: 0; border: 1px solid var(--demo-line); border-radius: 9px; background: var(--demo-paper); box-shadow: 0 12px 34px #2639580a; }
+.conversation { display: flex; flex-direction: column; overflow: hidden; }
+.panelHeader, .articleHeader { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 17px 20px; border-bottom: 1px solid var(--demo-line); }
+.panelHeader h2, .articleHeader h2 { margin: 3px 0 0; font: 600 16px/1.3 "Songti SC", "Noto Serif CJK SC", Georgia, serif; }
+.panelKicker { display: inline-flex; align-items: center; gap: 7px; color: var(--demo-muted); font: 600 9px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .12em; text-transform: uppercase; }
+.mockLabel { padding: 5px 7px; border-radius: 4px; background: var(--demo-amber-soft); color: var(--demo-amber); font-size: 10px; }
+.messageList { display: flex; flex: 1 1 auto; flex-direction: column; gap: 14px; min-height: 0; padding: 20px; overflow-y: auto; overscroll-behavior: contain; }
+.emptyConversation { display: flex; flex: 1 0 auto; flex-direction: column; align-items: flex-start; justify-content: center; max-width: 370px; margin: 0 auto; padding: 26px 16px; }
+.emptyGlyph { display: grid; width: 38px; height: 38px; margin-bottom: 18px; place-items: center; border: 1px solid #d7e1fa; border-radius: 50%; background: var(--demo-blue-soft); color: var(--demo-blue); font-size: 20px; }
+.emptyConversation h3, .emptyArticle h3 { margin: 0 0 8px; font: 600 21px/1.35 "Songti SC", "Noto Serif CJK SC", Georgia, serif; }
+.emptyConversation p, .emptyArticle p { margin: 0; color: var(--demo-muted); font-size: 12px; line-height: 1.8; }
+.starterButton { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 16px; margin-top: 24px; padding: 13px 14px; border: 1px solid #cdd9f3; border-radius: 6px; background: var(--demo-blue-soft); color: #294b9d; font-size: 12px; font-weight: 650; cursor: pointer; text-align: left; }
+.starterButton:hover { border-color: var(--demo-blue); background: #e6edff; }
+.starterButton span { font-size: 16px; }
+.starterHint { margin-top: 9px; color: #8993a4; font-size: 10px; line-height: 1.6; }
+.message { max-width: 94%; padding: 12px 14px; border-radius: 7px; animation: arrive .2s ease-out both; }
+.userMessage { align-self: flex-end; border: 1px solid #d9e2f5; background: #f4f7fd; }
+.assistantMessage { align-self: flex-start; border: 1px solid #e6eaf0; background: #fff; }
+.messageMeta { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; color: var(--demo-muted); font-size: 10px; font-weight: 650; }
+.replyTag { padding: 2px 5px; border-radius: 3px; background: var(--demo-amber-soft); color: var(--demo-amber); font-size: 9px; font-weight: 500; }
+.messageIndex { margin-left: auto; color: #a3adbb; font: 9px ui-monospace, SFMono-Regular, Menlo, monospace; }
+.message p { margin: 0; color: #3b4657; font-size: 12px; line-height: 1.8; white-space: pre-wrap; }
+.composer { flex: 0 0 auto; padding: 12px; border-top: 1px solid var(--demo-line); background: #fbfcfe; }
+.composer textarea { display: block; width: 100%; min-height: 68px; padding: 10px 11px; resize: vertical; border: 1px solid transparent; border-radius: 5px; background: #fff; color: var(--demo-ink); font-size: 12px; line-height: 1.7; }
+.composer textarea::placeholder { color: #9aa4b2; }
+.composer textarea:focus-visible { border-color: #c6d5fa; outline-offset: 1px; }
+.composerFooter { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; padding: 0 2px; }
+.composerFooter > span { color: #929cad; font-size: 9px; }
+.sendButton { display: inline-flex; min-height: 34px; align-items: center; gap: 11px; padding: 7px 11px; border: 1px solid var(--demo-blue); border-radius: 5px; background: var(--demo-blue); color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; }
+.sendButton:hover:not(:disabled) { border-color: #294ba8; background: #294ba8; }
+.sendButton:disabled { opacity: .42; cursor: not-allowed; }
+.sendButton span { font-size: 14px; }
+
+.articlePanel { display: flex; flex-direction: column; overflow: hidden; }
+.articleHeader { min-height: 72px; }
+.articleTitleGroup { min-width: 0; }
+.articleTitleGroup h2 { font-size: 17px; }
+.panelKicker i { width: 6px; height: 6px; border-radius: 50%; background: #8eb39c; }
+.articleActions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+.confirmedLabel { color: #35744f; font-size: 10px; }
+.confirmButton { min-height: 34px; padding: 7px 12px; border: 1px solid #cbd6ec; border-radius: 5px; background: #fff; color: #334e83; font-size: 11px; font-weight: 650; cursor: pointer; }
+.confirmButton:hover:not(:disabled) { border-color: var(--demo-blue); background: var(--demo-blue-soft); }
+.confirmButton:disabled { opacity: .5; cursor: not-allowed; }
+.editorArea { flex: 1 1 auto; min-height: 0; padding: 20px clamp(20px, 4vw, 64px); overflow: auto; background: linear-gradient(90deg, #fbfcfe, #fff 12%, #fff 88%, #fbfcfe); }
+.editorLoading { display: grid; min-height: 220px; place-items: center; color: var(--demo-muted); font-size: 12px; }
+.emptyArticle { position: relative; max-width: 650px; min-height: 100%; margin: 0 auto; padding: clamp(28px, 7vh, 72px) clamp(10px, 3vw, 40px); }
+.paperCorner { position: absolute; top: 22px; right: 22px; width: 34px; height: 34px; border-top: 1px solid #d6dfed; border-right: 1px solid #d6dfed; }
+.emptyArticleLabel { display: block; margin-bottom: 20px; color: #9aa5b4; font: 10px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .14em; text-transform: uppercase; }
+.emptyArticle h3 { margin-bottom: 11px; font-size: clamp(24px, 3vw, 34px); }
+.emptyArticle p { max-width: 420px; font-size: 13px; }
+.placeholderLines { display: grid; gap: 10px; max-width: 500px; margin-top: 46px; }
+.placeholderLines i { display: block; height: 5px; border-radius: 5px; background: #eef1f6; }
+.placeholderLines i:nth-child(2) { width: 94%; }
+.placeholderLines i:nth-child(3) { width: 98%; }
+.placeholderLines i:nth-child(4) { width: 63%; }
+.articleFooter { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px; padding: 8px 18px; border-top: 1px solid var(--demo-line); color: #8b96a5; font: 9px ui-monospace, SFMono-Regular, Menlo, monospace; }
+.loading { display: grid; flex: 1; place-items: center; color: var(--demo-muted); font-size: 12px; }
+.mobileTabs { display: none; }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+@keyframes arrive { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .message { animation: none; }
+  /* CSS Modules 的选择器需带本地类名，避免全局通配符被拒绝。 */
+  .page *, .page *::before, .page *::after { scroll-behavior: auto !important; }
+}
+
+@media (max-width: 850px) {
+  .page { height: 100dvh; min-height: 520px; padding: 16px 16px calc(72px + env(safe-area-inset-bottom)); }
+  .header { gap: 10px; }
+  .brand { gap: 9px; }
+  .brand img { width: 32px; height: 32px; }
+  .eyebrow { font-size: 8px; }
+  .brand h1 { font-size: 17px; }
+  .headerActions { gap: 11px; }
+  .backLink { display: none; }
+  .resetButton { min-height: 34px; padding: 6px 9px; }
+  .contextBar { min-height: 54px; margin: 14px 0 10px; padding: 8px 10px; gap: 9px; }
+  .contextMark { width: 26px; height: 26px; }
+  .contextCopy { flex: 1; }
+  .contextCopy strong { font-size: 11px; }
+  .contextCopy span { max-width: 58vw; font-size: 10px; }
+  .simulationNote { max-width: 112px; font-size: 9px; }
+  .workspace { position: relative; display: block; }
+  .conversation, .articlePanel { position: absolute; inset: 0; }
+  .showConversation .articlePanel, .showArticle .conversation { visibility: hidden; pointer-events: none; }
+  .showConversation .conversation, .showArticle .articlePanel { visibility: visible; }
+  .panelHeader, .articleHeader { padding: 13px 14px; }
+  .messageList { padding: 14px; }
+  .emptyConversation { padding: 20px 8px; }
+  .editorArea { padding: 14px; }
+  .articleFooter { min-height: 34px; padding: 6px 10px; font-size: 8px; }
+  .mobileTabs { position: fixed; z-index: 20; right: 0; bottom: 0; left: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 9px 16px calc(9px + env(safe-area-inset-bottom)); border-top: 1px solid var(--demo-line); background: #ffffffed; }
+  .mobileTabs button { min-height: 42px; border: 1px solid var(--demo-line); border-radius: 5px; background: #fff; color: var(--demo-muted); font-size: 12px; cursor: pointer; }
+  .mobileTabs button.activeTab { border-color: var(--demo-blue); background: var(--demo-blue); color: #fff; }
+}
+
+@media (max-width: 520px) {
+  .page { padding-right: 11px; padding-left: 11px; }
+  .contextBar { align-items: flex-start; flex-wrap: wrap; }
+  .simulationNote { width: 100%; max-width: none; margin: -3px 0 0 35px; text-align: left; }
+  .message { max-width: 100%; }
+  .articleActions { gap: 7px; }
+  .confirmedLabel { max-width: 74px; text-align: right; }
+  .composerFooter > span { max-width: 135px; line-height: 1.5; }
+}

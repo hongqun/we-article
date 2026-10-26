@@ -9,6 +9,7 @@ const items = [
   { href: "/style-memory", label: "风格记忆" },
   { href: "/overview", label: "架构与统计" },
   { href: "/security", label: "登录记录" },
+  { href: "/demo", label: "MVP Demo" },
 ];
 
 export default function AppNavigation({ onNavigate }: { onNavigate?: (href: string) => void }) {
