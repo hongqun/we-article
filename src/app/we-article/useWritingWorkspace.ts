@@ -158,8 +158,9 @@ export function useWritingWorkspace() {
           if (event.type === "status") { setStatus(event.message); setReasoning(""); }
           // 标题栏仅保留最近的推理片段，避免长时间生成时持续累积。
           if (event.type === "reasoning") setReasoning(current => (current + event.text).slice(-500));
-          if (event.type === "accepted") adopt(event.article);
-          if (event.type === "done") { adopt(event.article); setInstruction(""); completed = true; }
+          // 消息已进入对话后清空输入框，接受前失败则保留输入。
+          if (event.type === "accepted") { adopt(event.article); setInstruction(""); }
+          if (event.type === "done") { adopt(event.article); completed = true; }
           if (event.type === "error") throw new Error(event.message);
         }
         try {
