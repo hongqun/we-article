@@ -10,7 +10,7 @@ export function beginWriting(id: string, instruction: string) {
     async execute(signal: AbortSignal, onStatus: (message: string) => void, onReasoning: (text: string) => void) {
       const result = await runWritingAgent(run, signal, onStatus, onReasoning);
       if (signal.aborted) throw new Error("请求中断");
-      const article = store.finish(id, result.draft, result.reply);
+      const article = store.finish(id, result.draft, result.reply, result.sources);
       return { article, reply: result.reply };
     },
   };

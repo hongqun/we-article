@@ -2,7 +2,7 @@ import Database from "better-sqlite3";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import type { Article, ArticleSummary, Message } from "./types";
+import type { Article, ArticleSummary, Message, Source } from "./types";
 import { ArticleError } from "./validation";
 
 type Row = ArticleSummary & { body: string };
@@ -30,6 +30,9 @@ export class WritingStore {
       );
       CREATE INDEX IF NOT EXISTS messages_article ON messages(article_id,ordinal);
     `);
+    // 在现有消息中标记网页素材，旧消息保持普通对话。
+    const messageColumns = (this.db.pragma("table_info(messages)") as { name: string }[]).map(column => column.name);
+    if (!messageColumns.includes("source_url")) this.db.exec("ALTER TABLE messages ADD COLUMN source_url TEXT");
     // 旧库移除不再使用的并发控制字段，保留文章与对话。
     const names = (this.db.pragma("table_info(articles)") as { name: string }[]).map(column => column.name);
     this.db.transaction(() => {
@@ -50,7 +53,7 @@ export class WritingStore {
   read(id: string): Article {
     return this.db.transaction(() => {
       const row = this.row(id);
-      const messages = this.db.prepare(`SELECT id,role,content,created_at AS createdAt
+      const messages = this.db.prepare(`SELECT id,role,content,created_at AS createdAt,source_url AS sourceUrl
         FROM messages WHERE article_id=? ORDER BY ordinal`).all(id) as Message[];
       return { ...row, messages };
     })();
@@ -79,11 +82,13 @@ export class WritingStore {
       return this.read(id);
     }).immediate();
   }
-  finish(id: string, draft: { title: string; body: string }, reply: string) {
+  finish(id: string, draft: { title: string; body: string }, reply: string, sources: Source[]) {
     return this.db.transaction(() => {
       this.row(id);
       const now = new Date().toISOString();
       this.db.prepare(`UPDATE articles SET title=?,body=?,updated_at=? WHERE id=?`).run(draft.title, draft.body, now, id);
+      const insertSource = this.db.prepare(`INSERT INTO messages(id,article_id,role,content,created_at,source_url) VALUES (?,?,'assistant',?,?,?)`);
+      for (const source of sources) insertSource.run(randomUUID(), id, source.content, source.createdAt, source.url);
       this.db.prepare(`INSERT INTO messages(id,article_id,role,content,created_at) VALUES (?,?,'assistant',?,?)`)
         .run(randomUUID(), id, reply, now);
       return this.read(id);
@@ -93,7 +98,7 @@ export class WritingStore {
   updateMessage(id: string, messageId: string, content: string): Article {
     return this.db.transaction(() => {
       this.row(id);
-      const result = this.db.prepare(`UPDATE messages SET content=? WHERE id=? AND article_id=? AND role='assistant'`)
+      const result = this.db.prepare(`UPDATE messages SET content=? WHERE id=? AND article_id=? AND role='assistant' AND source_url IS NULL`)
         .run(content, messageId, id);
       if (!result.changes) throw new ArticleError("助手消息不存在。", 404);
       this.db.prepare(`UPDATE articles SET updated_at=? WHERE id=?`).run(new Date().toISOString(), id);

@@ -11,7 +11,8 @@
 ## 数据与配置
 
 - 新库固定为项目根目录的 `data/we-article.db`，首次调用文章接口时初始化，不读取或迁移旧数据库。
-- 文章包含标题、Markdown 正文、时间和按序保存的对话；粘贴材料与要求作为用户对话保存。
+- 文章包含标题、Markdown 正文、时间和按序保存的对话；粘贴材料与要求作为用户对话保存。网页素材在整轮成功后作为折叠消息保存来源、读取时间和正文，后续对话继续使用。
+- 正文面板可切换排版预览，选择六种内置风格并复制富文本；标题和配图在公众号后台单独处理。
 - MVP 模型配置只读取项目根目录 `.we-article.env` 中的 `MODEL_API_KEY`、`MODEL_BASE_URL`、`MODEL`、`MODEL_PROVIDER` 和 `STREAMING`，不读取旧工作台的模型配置。通用 OpenAI Chat Completions 兼容接口使用 `MODEL_PROVIDER=openai`，模型须支持工具调用。
 - DeepSeek 思考模式使用 `MODEL_PROVIDER=deepseek`，并通过 `THINKING_ENABLED`、`REASONING_EFFORT` 配置。通用模式不发送 DeepSeek 专有思考参数。 DeepSeek 适配器在 `completionWithRetry` 请求构造边界补回工具调用所需的 `reasoning_content`，复用官方集成的响应解析，不拦截 HTTP 请求。
 - 写作技能位于 `.agents/skills/`：`we-article-workflow` 负责协作流程，`we-article-analysis`、`we-article-topic`、`we-article-outline` 分别负责材料解读、选题和大纲，`we-article-writing` 和 `we-article-revision` 负责正文创作与修改。宽泛主题默认先讨论选题，再讨论大纲；用户明确要求直接写作或跳过讨论时可以跳过。中间讨论保存在文章对话中。
@@ -39,7 +40,7 @@
 生成期间当前页面暂时禁用编辑。切换或离开页面时保护未保存内容；避免在多个页面同时编辑同一篇文章。
 
 接口为 `GET/POST /api/we-article/articles`、`GET/PUT /api/we-article/articles/[id]` 和
-`POST /api/we-article/articles/[id]/chat`。保存提交 `{title,body}`，对话提交 `{instruction}`。
+`POST /api/we-article/articles/[id]/chat` 和 `POST /api/we-article/layout`（排版预览）。保存提交 `{title,body}`，对话提交 `{instruction}`。
 对话响应为 NDJSON，事件包括 `accepted`、`status`、`reasoning`、`reply`、`done`、`error`；推理片段仅用于实时展示。
 
 实现后仅进行类型、差异和依赖边界检查。真实模型、数据库读写和浏览器交互需要另行运行验证。

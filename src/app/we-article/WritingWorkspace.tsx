@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useWritingWorkspace } from "./useWritingWorkspace";
 import MessageMarkdown from "./MessageMarkdown";
+import LayoutPreview from "./LayoutPreview";
 import styles from "./workspace.module.css";
 
 // 原生对话框提供焦点圈定、Escape 关闭和背景隔离。
@@ -24,6 +25,7 @@ export default function WritingWorkspace() {
     busy, status, reasoning, error, setError, listOpen, setListOpen, pending, setPending,
     mobileView, setMobileView, conversation, dirty, locked, refreshList,
     editing, setEditing, messageDirty, saveMessage, withBusy, saveCurrent, navigate, requestNavigation, send } = useWritingWorkspace();
+  const [articleView, setArticleView] = useState<"editor" | "layout">("editor");
   const wordCount = Array.from(body.replace(/\s/g, "")).length;
   const reasoningRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -50,7 +52,10 @@ export default function WritingWorkspace() {
         </div></header>
         <div className={styles.messages} ref={conversation}>
           {!article?.messages.length && <div className={styles.empty}><span className={styles.emptyMark}>W</span><h2>从一个想法开始</h2><p>粘贴材料，告诉我你想怎么写。</p></div>}
-          {article?.messages.map(message => <div className={`${styles.message} ${message.role === "user" ? styles.user : styles.assistant}`} key={message.id}>
+          {article?.messages.map(message => message.sourceUrl ? <details className={styles.sourceMessage} key={message.id}>
+            <summary>已读取网页素材</summary><div className={styles.sourceUrl}>{message.sourceUrl}</div>
+            <time dateTime={message.createdAt}>{new Date(message.createdAt).toLocaleString("zh-CN")}</time>
+            <div className={styles.sourceContent}>{message.content}</div></details> : <div className={`${styles.message} ${message.role === "user" ? styles.user : styles.assistant}`} key={message.id}>
             <div className={styles.messageHeader}><span className={styles.messageRole}>{message.role === "user" ? "你" : "We-Article"}</span>
               {message.role === "assistant" && editing?.id !== message.id && <button type="button" className={styles.editButton}
                 disabled={locked || Boolean(editing)} onClick={() => setEditing({ id: message.id, content: message.content, original: message.content })}>编辑</button>}
@@ -72,10 +77,11 @@ export default function WritingWorkspace() {
         </form>
       </section>
       <section className={`${styles.panel} ${styles.articlePanel}`} aria-label="文章编辑器" id="writing-article">
-        <header className={styles.panelHeader}><h2>文章正文</h2><span aria-live="polite">{dirty ? "未保存" : article ? "已保存" : "未开始"}</span></header>
-        <div className={styles.editorWrap}><textarea className={styles.editor} aria-label="Markdown 正文" spellCheck={false}
+        <header className={styles.panelHeader}><div className={styles.articleViews}><button type="button" aria-pressed={articleView === "editor"} onClick={() => setArticleView("editor")}>文章正文</button><button type="button" aria-pressed={articleView === "layout"} onClick={() => setArticleView("layout")}>排版</button></div><span aria-live="polite">{dirty ? "未保存" : article ? "已保存" : "未开始"}</span></header>
+        <div className={styles.editorWrap} hidden={articleView !== "editor"}><textarea className={styles.editor} aria-label="Markdown 正文" spellCheck={false}
           placeholder="正文将在这里出现" maxLength={200000} value={body} disabled={!article || locked}
           onChange={event => setBody(event.target.value)} /></div>
+        <div className={styles.layoutWrap} hidden={articleView !== "layout"}><LayoutPreview title={title} body={body} /></div>
         <footer className={styles.documentFooter}><span>{wordCount.toLocaleString()} 字</span><span>Markdown</span></footer>
       </section>
     </div>

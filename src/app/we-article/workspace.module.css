@@ -100,3 +100,23 @@
   .error, .notice { padding: 8px 12px; }
 }
 @media (prefers-reduced-motion: reduce) { .messages { scroll-behavior: auto; } }
+
+/* 正文与排版共用工作区，样式选择不遮挡预览。 */
+.articleViews { display: flex; align-items: center; gap: 12px; }
+.page .articleViews button { padding: 3px 2px; border: 0; border-radius: 0; background: transparent; font-size: 14px; color: var(--muted); }
+.page .articleViews button[aria-pressed="true"] { color: var(--ink); font-weight: 600; box-shadow: 0 2px var(--accent); }
+.editorWrap[hidden], .layoutWrap[hidden] { display: none; }
+.layoutWrap { flex: 1; min-height: 0; display: flex; }
+.layout { flex: 1; min-height: 0; display: flex; flex-direction: column; background: #f5f7f8; }
+.layoutControls { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; }
+.layoutControls label { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.layoutControls select { padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: white; color: var(--ink); font: inherit; }
+.layoutHint { margin: 0; padding: 0 18px 8px; color: var(--muted); font-size: 12px; }
+.previewPaper { flex: 1; min-height: 0; width: min(100%, 430px); margin: 0 auto; display: flex; flex-direction: column; background: white; }
+.previewPaper h1 { margin: 0; padding: 20px 16px; font-size: 20px; line-height: 1.5; overflow-wrap: anywhere; }
+.previewPaper iframe { flex: 1; min-height: 0; width: 100%; border: 0; }
+.layoutEmpty { padding: 30px 18px; color: var(--muted); font-size: 13px; }
+.sourceMessage { margin-bottom: 18px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); font-size: 12px; }
+.sourceMessage summary { color: var(--accent); cursor: pointer; font-weight: 600; }
+.sourceUrl { margin-top: 8px; overflow-wrap: anywhere; }
+.sourceContent { max-height: 300px; overflow: auto; margin-top: 8px; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.7; color: var(--ink); }

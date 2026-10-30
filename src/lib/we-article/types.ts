@@ -10,7 +10,9 @@ export interface Message {
   role: "user" | "assistant";
   content: string;
   createdAt: string;
+  sourceUrl: string | null;
 }
+export interface Source { url: string; content: string; createdAt: string }
 export interface Article extends ArticleSummary {
   body: string;
   messages: Message[];
