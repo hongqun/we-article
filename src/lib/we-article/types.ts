@@ -4,6 +4,8 @@ export interface ArticleSummary {
   title: string;
   createdAt: string;
   updatedAt: string;
+  accountId: string | null;
+  topicId: string | null;
 }
 export interface Message {
   id: string;
@@ -24,3 +26,39 @@ export type StreamEvent =
   | { type: "reply"; text: string }
   | { type: "done"; article: Article }
   | { type: "error"; message: string };
+
+// 创作配置只保存名称与自然语言要求，不沿用旧专题的技术字段。
+export interface ConfigurationDraft { name: string; content: string }
+export interface WritingAccount extends ConfigurationDraft {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface ConfigurationSource { id: string; title: string; body: string }
+export interface WritingTopic extends WritingAccount {
+  accountId: string;
+  sources: ConfigurationSource[];
+}
+export interface ArticleSelection { accountId: string | null; topicId: string | null }
+export interface ConfigurationSessionSummary {
+  id: string;
+  kind: "account" | "topic";
+  name: string;
+  updatedAt: string;
+}
+export interface ConfigurationSession {
+  id: string;
+  kind: "account" | "topic";
+  accountId: string | null;
+  targetId: string | null;
+  confirmedId: string | null;
+  draft: ConfigurationDraft;
+  messages: { role: "user" | "assistant"; content: string }[];
+  sources: ConfigurationSource[];
+  updatedAt: string;
+}
+export interface WritingConfiguration {
+  accounts: WritingAccount[];
+  topics: WritingTopic[];
+  sessions: ConfigurationSessionSummary[];
+}

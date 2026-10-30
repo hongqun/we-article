@@ -2,21 +2,24 @@ import Database from "better-sqlite3";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import type { Article, ArticleSummary, Message, Source } from "./types";
+import type { Article, ArticleSelection, ArticleSummary, Message, Source } from "./types";
 import { ArticleError } from "./validation";
+import { ConfigurationStore } from "./configuration-store";
 
 type Row = ArticleSummary & { body: string };
-const columns = `id,title,body,created_at AS createdAt,updated_at AS updatedAt`;
+const columns = `id,title,body,created_at AS createdAt,updated_at AS updatedAt,account_id AS accountId,topic_id AS topicId`;
 
 // 文章和对话保存在独立数据库中。
 export class WritingStore {
   private readonly db: Database.Database;
+  readonly configuration: ConfigurationStore;
   constructor(filename = path.join(process.cwd(), "data", "we-article.db")) {
     mkdirSync(path.dirname(filename), { recursive: true });
     this.db = new Database(filename);
     this.db.pragma("journal_mode = DELETE");
     this.db.pragma("foreign_keys = ON");
     this.db.pragma("busy_timeout = 5000");
+    this.configuration = new ConfigurationStore(this.db);
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS articles (
         id TEXT PRIMARY KEY, title TEXT NOT NULL, body TEXT NOT NULL,
@@ -36,13 +39,16 @@ export class WritingStore {
     // 旧库移除不再使用的并发控制字段，保留文章与对话。
     const names = (this.db.pragma("table_info(articles)") as { name: string }[]).map(column => column.name);
     this.db.transaction(() => {
+      // 旧文章没有账号与专题，迁移后继续按通用规则写作。
+      if (!names.includes("account_id")) this.db.exec("ALTER TABLE articles ADD COLUMN account_id TEXT REFERENCES writing_accounts(id)");
+      if (!names.includes("topic_id")) this.db.exec("ALTER TABLE articles ADD COLUMN topic_id TEXT REFERENCES writing_topics(id)");
       for (const name of ["run_token", "run_until", "revision"]) {
         if (names.includes(name)) this.db.exec(`ALTER TABLE articles DROP COLUMN ${name}`);
       }
     })();
   }
   list(): ArticleSummary[] {
-    return this.db.prepare(`SELECT id,title,created_at AS createdAt,updated_at AS updatedAt
+    return this.db.prepare(`SELECT id,title,created_at AS createdAt,updated_at AS updatedAt,account_id AS accountId,topic_id AS topicId
       FROM articles ORDER BY updated_at DESC,id`).all() as ArticleSummary[];
   }
   private row(id: string): Row {
@@ -58,10 +64,19 @@ export class WritingStore {
       return { ...row, messages };
     })();
   }
-  create(): Article {
+  create(selection: ArticleSelection = { accountId: null, topicId: null }): Article {
+    this.configuration.validateSelection(selection);
     const id = randomUUID(), now = new Date().toISOString();
-    this.db.prepare(`INSERT INTO articles(id,title,body,created_at,updated_at)
-      VALUES (?,'未命名文章','',?,?)`).run(id, now, now);
+    this.db.prepare(`INSERT INTO articles(id,title,body,created_at,updated_at,account_id,topic_id)
+      VALUES (?,'未命名文章','',?,?,?,?)`).run(id, now, now, selection.accountId, selection.topicId);
+    return this.read(id);
+  }
+  // 更换归属只影响后续写作，不修改正文、对话或提炼来源文章。
+  selectConfiguration(id: string, selection: ArticleSelection): Article {
+    this.row(id);
+    this.configuration.validateSelection(selection);
+    this.db.prepare("UPDATE articles SET account_id=?,topic_id=?,updated_at=? WHERE id=?")
+      .run(selection.accountId, selection.topicId, new Date().toISOString(), id);
     return this.read(id);
   }
   save(id: string, draft: { title: string; body: string }): Article {

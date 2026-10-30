@@ -1,32 +1,48 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { ConfigurationSession } from "../../lib/we-article/types";
 import { useWritingWorkspace } from "./useWritingWorkspace";
 import MessageMarkdown from "./MessageMarkdown";
 import LayoutPreview from "./LayoutPreview";
 import styles from "./workspace.module.css";
-
-// 原生对话框提供焦点圈定、Escape 关闭和背景隔离。
-function Modal({ label, onClose, children }: { label: string; onClose: () => void; children: ReactNode }) {
-  const ref = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    const dialog = ref.current;
-    const previous = document.activeElement;
-    dialog?.showModal();
-    return () => { dialog?.close(); if (previous instanceof HTMLElement) previous.focus(); };
-  }, []);
-  return <dialog ref={ref} className={styles.dialog} aria-labelledby={label}
-    onCancel={event => { event.preventDefault(); onClose(); }}>{children}</dialog>;
-}
+import Modal from "./WorkspaceModal";
+import ConfigurationPicker from "./ConfigurationPicker";
+import ConfigurationManager from "./ConfigurationManager";
+import { json } from "./client";
 
 // 独立写作页面展示当前文章和对话。
 export default function WritingWorkspace() {
   const { article, title, setTitle, body, setBody, instruction, setInstruction, articles,
     busy, status, reasoning, error, setError, listOpen, setListOpen, pending, setPending,
     mobileView, setMobileView, conversation, dirty, locked, refreshList,
-    editing, setEditing, messageDirty, saveMessage, withBusy, saveCurrent, navigate, requestNavigation, send } = useWritingWorkspace();
+    editing, setEditing, messageDirty, saveMessage, withBusy, saveCurrent, navigate, requestNavigation, send,
+    configuration, refreshConfiguration, selectionIntent, setSelectionIntent, chooseConfiguration, openConfigurationSelection } = useWritingWorkspace();
   const [articleView, setArticleView] = useState<"editor" | "layout">("editor");
   const [copiedMessage, setCopiedMessage] = useState<string | null>(null);
+  const [configurationOpen, setConfigurationOpen] = useState(false);
+  const [setupSession, setSetupSession] = useState<ConfigurationSession | null>(null);
+  const [selectedArticles, setSelectedArticles] = useState<string[]>([]);
+  const [search, setSearch] = useState("");
+  const [accountFilter, setAccountFilter] = useState("");
+  const [extractionAccountId, setExtractionAccountId] = useState<string | null>(null);
+  const account = configuration.accounts.find(item => item.id === article?.accountId);
+  const topic = configuration.topics.find(item => item.id === article?.topicId);
+  async function openConfigurationManager() {
+    await withBusy(async () => { await refreshConfiguration(); setSetupSession(null); setConfigurationOpen(true); });
+  }
+  // 提炼仅使用保存后的正文，保持来源文章归属不变。
+  async function extractTopic() {
+    await withBusy(async () => {
+      if (article && selectedArticles.includes(article.id)) await saveCurrent();
+      const accountIds = new Set(articles.filter(item => selectedArticles.includes(item.id)).map(item => item.accountId));
+      const accountId = extractionAccountId ?? (accountIds.size === 1 ? [...accountIds][0] : null);
+      const session = await json<ConfigurationSession>("/api/we-article/configuration/sessions", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind: "topic", accountId, sourceArticleIds: selectedArticles }) });
+      setSetupSession(session); setListOpen(false); setSelectedArticles([]); setConfigurationOpen(true);
+      await refreshConfiguration();
+    });
+  }
   // 复制回复的原始 Markdown，保留列表和链接等内容。
   async function copyMessage(id: string, content: string) {
     try {
@@ -50,7 +66,8 @@ export default function WritingWorkspace() {
         maxLength={200} disabled={!article || locked} onChange={event => setTitle(event.target.value)} />
       <div className={styles.actions}>
         <button type="button" disabled={locked} onClick={() => requestNavigation({ kind: "new" })}>新建</button>
-        <button type="button" disabled={busy} onClick={() => setListOpen(true)}>打开</button>
+        <button type="button" disabled={busy} onClick={() => { setSelectedArticles([]); setExtractionAccountId(null); setListOpen(true); }}>文章</button>
+        <button type="button" disabled={locked} onClick={() => void openConfigurationManager()}>账号与专题</button>
         <button type="button" className={styles.primary} disabled={!article || !dirty || locked}
           onClick={() => void withBusy(async () => { await saveCurrent(); })}>保存</button>
       </div>
@@ -58,7 +75,10 @@ export default function WritingWorkspace() {
     {error && <div className={styles.error} role="alert"><span>{error}</span><button type="button" onClick={() => setError("")} aria-label="关闭提示">×</button></div>}
     <div className={`${styles.workspace} ${mobileView === "article" ? styles.showArticle : styles.showChat}`}>
       <section className={`${styles.panel} ${styles.chatPanel}`} aria-label="写作对话" id="writing-chat">
-        <header className={styles.panelHeader}><h1>写作对话</h1><div ref={reasoningRef} className={styles.activity}>
+        <header className={styles.panelHeader}><div className={styles.chatHeading}><h1>写作对话</h1>
+          <button type="button" className={styles.configurationBadge} disabled={!article || locked || Boolean(editing)} onClick={() => void openConfigurationSelection()}>
+            {account ? `${account.name}${topic ? ` / ${topic.name}` : ""}` : "通用写作"} ▾</button>
+        </div><div ref={reasoningRef} className={styles.activity}>
           {busy && (reasoning ? <span>{reasoning.replace(/\s+/g, " ")}</span> : <span aria-live="polite">{status || "处理中…"}</span>)}
         </div></header>
         <div className={styles.messages} ref={conversation}>
@@ -104,14 +124,32 @@ export default function WritingWorkspace() {
       <button type="button" aria-controls="writing-article" aria-pressed={mobileView === "article"} onClick={() => setMobileView("article")}>正文</button>
     </nav>
     {listOpen && <Modal label="article-list-title" onClose={() => { if (!busy) setListOpen(false); }}>
-      <header className={styles.dialogHeader}><h2 id="article-list-title">打开文章</h2><button type="button" onClick={() => setListOpen(false)} aria-label="关闭文章列表">×</button></header>
+      <header className={styles.dialogHeader}><h2 id="article-list-title">文章</h2><button type="button" disabled={busy} onClick={() => setListOpen(false)} aria-label="关闭文章列表">×</button></header>
+      <div className={styles.articleFilters}><input aria-label="搜索文章" placeholder="搜索文章……" value={search} onChange={event => setSearch(event.target.value)} />
+        <select aria-label="按账号筛选文章" value={accountFilter} onChange={event => setAccountFilter(event.target.value)}><option value="">全部账号</option>
+          <option value="none">通用写作</option>{configuration.accounts.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+        </select></div>
       <div className={styles.articleList}>{!articles.length && <p>还没有保存的文章。</p>}
-        {articles.map(item => <button type="button" className={styles.articleItem} key={item.id} disabled={locked}
-          onClick={() => requestNavigation({ kind: "open", id: item.id })}><strong>{item.title}</strong><time dateTime={item.updatedAt}>{new Date(item.updatedAt).toLocaleString("zh-CN")}</time></button>)}
+        {articles.filter(item => item.title.toLowerCase().includes(search.toLowerCase()) && (!accountFilter || (accountFilter === "none" ? !item.accountId : item.accountId === accountFilter))).map(item => <div className={styles.selectableArticle} key={item.id}>
+          <input type="checkbox" aria-label={`选择“${item.title}”提炼专题`} disabled={locked} checked={selectedArticles.includes(item.id)}
+            onChange={event => setSelectedArticles(current => event.target.checked ? [...current, item.id] : current.filter(id => id !== item.id))} />
+          <button type="button" className={styles.articleItem} disabled={locked} onClick={() => requestNavigation({ kind: "open", id: item.id })}>
+            <strong>{item.title}</strong><span>{configuration.accounts.find(account => account.id === item.accountId)?.name ?? "通用写作"}</span>
+            <time dateTime={item.updatedAt}>{new Date(item.updatedAt).toLocaleString("zh-CN")}</time></button>
+        </div>)}
       </div>
       {error && <p className={styles.dialogError} role="alert">{error}</p>}
-      <footer className={styles.dialogActions}><button type="button" disabled={busy} onClick={() => void withBusy(refreshList)}>刷新列表</button></footer>
+      <footer className={styles.dialogActions}><span>已选 {selectedArticles.length} 篇</span>
+        <button type="button" disabled={busy} onClick={() => void withBusy(refreshList)}>刷新</button>
+        <button type="button" className={styles.primary} disabled={busy || !selectedArticles.length || selectedArticles.length > 20} onClick={() => void extractTopic()}>提炼为专题</button></footer>
+      {selectedArticles.length > 20 && <p role="alert">一次最多选择 20 篇文章。</p>}
     </Modal>}
+    {selectionIntent && <ConfigurationPicker configuration={configuration} initial={selectionIntent === "change" ? article ?? undefined : undefined}
+      changing={selectionIntent === "change"} busy={busy} error={error} onClose={() => setSelectionIntent(null)} onChoose={value => void chooseConfiguration(value)} />}
+    {configurationOpen && <ConfigurationManager configuration={configuration} initialSession={setupSession} onChanged={refreshConfiguration}
+      onClose={() => setConfigurationOpen(false)} onExtract={accountId => {
+        setExtractionAccountId(accountId); setConfigurationOpen(false); setSelectedArticles([]); setSearch(""); setAccountFilter(""); setListOpen(true);
+      }} />}
     {pending && <Modal label="unsaved-title" onClose={() => { if (!busy) setPending(null); }}>
       <h2 id="unsaved-title">还有未保存的内容</h2><p>保存当前正文和回复修改后切换？输入框中的文字将清空。</p>
       {error && <p className={styles.dialogError} role="alert">{error}</p>}

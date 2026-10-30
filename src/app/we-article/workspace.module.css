@@ -121,3 +121,74 @@
 .sourceMessage summary { color: var(--accent); cursor: pointer; font-weight: 600; }
 .sourceUrl { margin-top: 8px; overflow-wrap: anywhere; }
 .sourceContent { max-height: 300px; overflow: auto; margin-top: 8px; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.7; color: var(--ink); }
+
+/* 配置入口保持紧凑，管理与草稿在独立窗口展开。 */
+.chatHeading { min-width: 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; }
+.page .configurationBadge { max-width: 260px; overflow: hidden; text-overflow: ellipsis; padding: 3px 7px; font-size: 12px; color: var(--accent); background: #f0f6f6; border-color: #d3e3e4; }
+.configurationFields { display: grid; gap: 14px; }
+.configurationFields label { display: grid; gap: 7px; font-size: 13px; }
+.configurationFields input, .configurationFields select, .articleFilters input, .articleFilters select { min-width: 0; width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); background: #fff; }
+.configurationSummary { max-height: 300px; overflow: auto; margin-top: 20px; padding: 14px; border: 1px solid #d3e3e4; border-radius: 7px; background: #f3f8f8; font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+.configurationSummary details { margin-top: 10px; }
+.configurationSummary summary, .configurationSources summary { cursor: pointer; color: var(--accent); }
+.dialogActions > span { margin-right: auto; align-self: center; color: var(--muted); font-size: 12px; }
+.articleFilters { display: grid; grid-template-columns: 1fr 140px; gap: 10px; margin-bottom: 14px; }
+.selectableArticle { display: flex; align-items: center; gap: 10px; }
+.selectableArticle > input { flex: 0 0 auto; width: 17px; height: 17px; accent-color: var(--accent); }
+.selectableArticle .articleItem { flex: 1; min-width: 0; }
+.articleItem > span { color: var(--accent); font-size: 12px; }
+.page .configurationDialog { width: min(1360px, calc(100% - 40px)); height: min(850px, calc(100dvh - 48px)); max-height: none; padding: 20px; }
+.configurationDialog[open] { display: flex; flex-direction: column; }
+.configurationDialog .dialogHeader { flex-shrink: 0; }
+.configurationDialog .dialogError, .configurationNotice { margin: 0 0 12px; }
+.configurationManager { flex: 1; min-height: 0; display: grid; grid-template-columns: 210px minmax(0, 1fr); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.configurationDirectory { overflow-y: auto; padding: 14px; background: #f5f8fa; border-right: 1px solid var(--line); }
+.configurationDirectory > button { width: 100%; }
+.accountGroup { display: grid; gap: 5px; margin-top: 22px; }
+.accountGroup h3 { margin: 0 0 6px; color: var(--muted); font-size: 12px; }
+.page .accountGroup button { text-align: left; white-space: normal; overflow-wrap: anywhere; font-size: 13px; padding: 7px 10px; border-color: transparent; background: transparent; }
+.page .accountGroup .accountName { font-weight: 650; padding-left: 4px; }
+.page .accountGroup button[aria-pressed="true"] { border-color: #c1d9dc; background: #e6f0f1; color: var(--accent); }
+.configurationDetail { min-width: 0; overflow: auto; padding: 28px; }
+.configurationDetail > header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; }
+.configurationDetail h3 { margin: 0; font-size: 18px; }
+.configurationDetail > .markdown { max-width: 800px; }
+.topicCards { display: grid; gap: 10px; margin-top: 30px; }
+.topicCards button { text-align: left; }
+.configurationEditing { min-height: 0; min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.configurationChat, .configurationDraft { min-height: 0; min-width: 0; display: flex; flex-direction: column; padding: 18px; }
+.configurationChat { border-right: 1px solid var(--line); }
+.configurationChat h3, .configurationDraft h3 { margin: 0 0 16px; font-size: 15px; }
+.configurationMessages { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+.configurationMessages .message { font-size: 13px; padding: 12px; margin-left: 0; }
+.configurationComposer { flex-shrink: 0; display: grid; gap: 8px; padding-top: 12px; }
+.configurationComposer textarea { width: 100%; resize: vertical; min-height: 90px; max-height: 180px; padding: 10px; border: 1px solid var(--line); border-radius: 6px; background: #f6f8fa; font: inherit; font-size: 13px; }
+.configurationComposer button { justify-self: end; }
+.configurationDraft { overflow: auto; }
+.configurationContentLabel { flex: 1; min-height: 180px; display: flex; flex-direction: column; gap: 8px; margin-top: 16px; font-size: 13px; }
+.configurationContentLabel textarea { flex: 1; width: 100%; min-height: 160px; resize: vertical; padding: 12px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); font: inherit; line-height: 1.8; }
+.configurationSources { flex-shrink: 0; margin-top: 16px; font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+.configurationSources > details { margin: 10px 0; padding: 10px; max-height: 300px; overflow: auto; background: #f5f8fa; border-radius: 6px; }
+.configurationDraft > .dialogActions { flex-shrink: 0; }
+@media (max-width: 1000px) {
+  .configurationManager { grid-template-columns: 175px minmax(0, 1fr); }
+  .configurationEditing { grid-template-columns: 1fr; overflow-y: auto; }
+  .configurationChat, .configurationDraft { min-height: 420px; overflow: visible; }
+  .configurationChat { border-right: 0; border-bottom: 1px solid var(--line); }
+  .configurationMessages { max-height: 300px; }
+}
+@media (max-width: 760px) {
+  .topbar { column-gap: 8px; }
+  .brand { font-size: 15px; }
+  .actions { flex-wrap: wrap; justify-content: flex-end; }
+  .actions button { padding: 5px 7px; }
+  .page .configurationDialog { width: calc(100% - 16px); height: calc(100dvh - 16px); padding: 12px; }
+  .configurationManager { display: flex; flex-direction: column; }
+  .configurationDirectory { flex-shrink: 0; max-height: 150px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .configurationDirectory > button { width: auto; }
+  .accountGroup { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 5px; margin: 8px 10px 0 0; }
+  .configurationEditing { flex: 1; }
+  .configurationDetail { padding: 18px; }
+  .articleFilters { grid-template-columns: 1fr 110px; }
+  .configurationBadge { max-width: 180px; }
+}
