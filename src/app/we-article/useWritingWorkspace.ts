@@ -19,12 +19,14 @@ export function useWritingWorkspace() {
   const [error, setError] = useState("");
   const [listOpen, setListOpen] = useState(false);
   const [pending, setPending] = useState<Target | null>(null);
+  const [editing, setEditing] = useState<{ id: string; content: string; original: string } | null>(null);
   const [mobileView, setMobileView] = useState<"chat" | "article">("chat");
   const operation = useRef(false);
   const controller = useRef<AbortController | null>(null);
   const mounted = useRef(false);
   const conversation = useRef<HTMLDivElement>(null);
   const dirty = Boolean(article && (title !== article.title || body !== article.body));
+  const messageDirty = Boolean(editing && editing.content !== editing.original);
   const locked = busy;
 
   const adopt = useCallback((value: Article | null) => {
@@ -59,11 +61,11 @@ export function useWritingWorkspace() {
 
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => {
-      if (dirty || busy || instruction.trim()) { event.preventDefault(); event.returnValue = ""; }
+      if (dirty || messageDirty || busy || instruction.trim()) { event.preventDefault(); event.returnValue = ""; }
     };
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [dirty, busy, instruction]);
+  }, [dirty, messageDirty, busy, instruction]);
   useEffect(() => {
     conversation.current?.scrollTo({ top: conversation.current.scrollHeight, behavior: "smooth" });
   }, [article?.messages.length, status]);
@@ -88,17 +90,30 @@ export function useWritingWorkspace() {
     void refreshList().catch(() => {});
     return saved;
   }
+  // 消息保存只替换服务端快照，不覆盖用户尚未保存的标题和正文。
+  async function saveMessage() {
+    if (!article || !editing) return;
+    if (messageDirty) {
+      const saved = await json<Article>(`${api}/${article.id}/messages/${editing.id}`, {
+        method: "PUT", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: editing.content }),
+      });
+      setArticle(saved);
+      void refreshList().catch(() => {});
+    }
+    setEditing(null);
+  }
   async function navigate(target: Target) {
     let next: Article | null = null;
     if (target.kind === "new") next = await json<Article>(api, { method: "POST" });
     if (target.kind === "open") next = await json<Article>(`${api}/${encodeURIComponent(target.id)}`);
-    adopt(next); setInstruction(""); setListOpen(false); setPending(null);
+    adopt(next); setEditing(null); setInstruction(""); setListOpen(false); setPending(null);
     window.history[target.replace ? "replaceState" : "pushState"]({}, "", locationFor(next?.id));
     await refreshList().catch(() => {});
   }
   function requestNavigation(target: Target) {
     if (busy || operation.current) return;
-    if (dirty || instruction.trim()) setPending(target);
+    if (dirty || messageDirty || instruction.trim()) setPending(target);
     else void withBusy(() => navigate(target));
   }
   // 浏览器前进后退同样经过未保存检查；先恢复当前地址，再处理目标文章。
@@ -113,7 +128,7 @@ export function useWritingWorkspace() {
   });
 
   async function send() {
-    if (locked || !instruction.trim()) return;
+    if (locked || editing || !instruction.trim()) return;
     await withBusy(async () => {
       let current: Article;
       if (article) current = await saveCurrent();
@@ -172,5 +187,5 @@ export function useWritingWorkspace() {
   return { article, title, setTitle, body, setBody, instruction, setInstruction, articles,
     busy, status, reasoning, error, setError, listOpen, setListOpen, pending, setPending,
     mobileView, setMobileView, conversation, dirty, locked, adopt, refreshList,
-    withBusy, saveCurrent, navigate, requestNavigation, send };
+    editing, setEditing, messageDirty, saveMessage, withBusy, saveCurrent, navigate, requestNavigation, send };
 }

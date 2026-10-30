@@ -89,6 +89,17 @@ export class WritingStore {
       return this.read(id);
     }).immediate();
   }
+  // 只修改当前文章中的助手回复，保留消息顺序和创建时间。
+  updateMessage(id: string, messageId: string, content: string): Article {
+    return this.db.transaction(() => {
+      this.row(id);
+      const result = this.db.prepare(`UPDATE messages SET content=? WHERE id=? AND article_id=? AND role='assistant'`)
+        .run(content, messageId, id);
+      if (!result.changes) throw new ArticleError("助手消息不存在。", 404);
+      this.db.prepare(`UPDATE articles SET updated_at=? WHERE id=?`).run(new Date().toISOString(), id);
+      return this.read(id);
+    }).immediate();
+  }
 }
 let store: WritingStore | undefined;
 export function writingStore() { return store ??= new WritingStore(); }

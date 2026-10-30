@@ -9,6 +9,8 @@ export const draftSchema = z.object({
 export const chatSchema = z.object({
   instruction: z.string().trim().min(1, "请输入材料或要求。").max(50000),
 });
+// 助手回复以原始 Markdown 保存，允许用户清空内容。
+export const messageSchema = z.object({ content: z.string().max(200000) });
 export class ArticleError extends Error {
   constructor(message: string, readonly status: number) { super(message); }
 }

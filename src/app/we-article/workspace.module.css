@@ -28,11 +28,36 @@
 .emptyMark { color: var(--accent); font-family: Georgia, serif; font-size: 38px; font-style: italic; line-height: 1.3; }
 .empty h2 { margin: 14px 0 8px; font-size: 18px; color: var(--ink); font-weight: 500; }
 .empty p { margin: 0; font-size: 13px; }
-.message { padding: 14px 16px; border-radius: 8px; margin-bottom: 18px; font-size: 14px; line-height: 1.85; overflow-wrap: anywhere; white-space: pre-wrap; }
+.message { padding: 14px 16px; border-radius: 8px; margin-bottom: 18px; font-size: 14px; line-height: 1.85; overflow-wrap: anywhere; }
 .user { background: #f0f4f7; margin-left: 20px; }
-.assistant { padding-left: 0; padding-right: 4px; }
-.messageRole { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 600; color: var(--muted); }
+.userContent { white-space: pre-wrap; }
+.assistant { border: 1px solid #e3eaed; background: #fbfcfc; }
+.messageHeader { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
+.messageRole { display: block; font-size: 11px; font-weight: 600; color: var(--muted); }
 .assistant .messageRole { color: var(--accent); }
+.page .editButton { padding: 2px 8px; font-size: 12px; color: var(--muted); background: transparent; border-color: transparent; }
+/* 对话成果保持可读行距，表格与代码在内容框内滚动。 */
+.markdown { min-width: 0; line-height: 1.85; }
+.markdown > :first-child { margin-top: 0; }
+.markdown > :last-child { margin-bottom: 0; }
+.markdown h1, .markdown h2, .markdown h3, .markdown h4, .markdown h5, .markdown h6 { margin: 1.1em 0 .45em; line-height: 1.45; color: var(--ink); }
+.markdown h1 { font-size: 1.2em; } .markdown h2 { font-size: 1.12em; } .markdown h3 { font-size: 1.05em; }
+.markdown p, .markdown ul, .markdown ol, .markdown blockquote, .markdown pre { margin: .65em 0; }
+.markdown ul, .markdown ol { padding-left: 1.5em; }
+.markdown li p { margin: .25em 0; }
+.markdown blockquote { padding-left: 12px; border-left: 3px solid #a8c6c8; color: #60717b; }
+.markdown a { color: var(--accent); }
+.markdown code { background: #edf2f3; border-radius: 3px; padding: 1px 4px; }
+.markdown pre { overflow-x: auto; padding: 10px; border-radius: 5px; background: #edf2f3; }
+.markdown pre code { padding: 0; }
+.markdown :global(.message-table) { max-width: 100%; overflow-x: auto; }
+.markdown table { border-collapse: collapse; width: 100%; }
+.markdown td { border: 1px solid var(--line); padding: 5px 8px; min-width: 80px; }
+.markdown tr:first-child { background: #edf3f3; font-weight: 600; }
+.messageEditor { display: block; resize: vertical; width: 100%; min-height: 220px; max-height: 60dvh; padding: 10px; border: 1px solid var(--line); border-radius: 5px; background: #fff; color: var(--ink); font-size: 14px; line-height: 1.7; }
+.messageActions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 10px; }
+.messageActions span { margin-right: auto; font-size: 11px; color: var(--muted); }
+.messageActions button { font-size: 12px; padding: 4px 10px; }
 .composer { padding: 14px; margin: 0; border-top: 1px solid var(--line); }
 .composer textarea { display: block; resize: vertical; width: 100%; min-height: 80px; max-height: 30dvh; padding: 10px; border: 0; border-radius: 5px; background: #f6f8fa; color: var(--ink); line-height: 1.7; font-size: 14px; }
 .composerFooter { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; }

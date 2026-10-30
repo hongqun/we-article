@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import { useWritingWorkspace } from "./useWritingWorkspace";
+import MessageMarkdown from "./MessageMarkdown";
 import styles from "./workspace.module.css";
 
 // 原生对话框提供焦点圈定、Escape 关闭和背景隔离。
@@ -22,7 +23,7 @@ export default function WritingWorkspace() {
   const { article, title, setTitle, body, setBody, instruction, setInstruction, articles,
     busy, status, reasoning, error, setError, listOpen, setListOpen, pending, setPending,
     mobileView, setMobileView, conversation, dirty, locked, refreshList,
-    withBusy, saveCurrent, navigate, requestNavigation, send } = useWritingWorkspace();
+    editing, setEditing, messageDirty, saveMessage, withBusy, saveCurrent, navigate, requestNavigation, send } = useWritingWorkspace();
   const wordCount = Array.from(body.replace(/\s/g, "")).length;
   const reasoningRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -50,14 +51,24 @@ export default function WritingWorkspace() {
         <div className={styles.messages} ref={conversation}>
           {!article?.messages.length && <div className={styles.empty}><span className={styles.emptyMark}>W</span><h2>从一个想法开始</h2><p>粘贴材料，告诉我你想怎么写。</p></div>}
           {article?.messages.map(message => <div className={`${styles.message} ${message.role === "user" ? styles.user : styles.assistant}`} key={message.id}>
-            <span className={styles.messageRole}>{message.role === "user" ? "你" : "We-Article"}</span><div>{message.content}</div>
+            <div className={styles.messageHeader}><span className={styles.messageRole}>{message.role === "user" ? "你" : "We-Article"}</span>
+              {message.role === "assistant" && editing?.id !== message.id && <button type="button" className={styles.editButton}
+                disabled={locked || Boolean(editing)} onClick={() => setEditing({ id: message.id, content: message.content, original: message.content })}>编辑</button>}
+            </div>
+            {message.role === "user" ? <div className={styles.userContent}>{message.content}</div> : editing?.id === message.id ? <>
+              <textarea className={styles.messageEditor} aria-label="编辑助手回复 Markdown" value={editing.content} maxLength={200000}
+                disabled={locked} onChange={event => setEditing({ ...editing, content: event.target.value })} />
+              <div className={styles.messageActions}><span>Markdown</span><button type="button" disabled={locked}
+                onClick={() => { if (!messageDirty || window.confirm("放弃对这条回复的修改？")) setEditing(null); }}>取消</button>
+                <button type="button" className={styles.primary} disabled={locked} onClick={() => void withBusy(saveMessage)}>保存</button></div>
+            </> : <div className={styles.markdown}><MessageMarkdown content={message.content} /></div>}
           </div>)}
         </div>
         <form className={styles.composer} onSubmit={event => { event.preventDefault(); void send(); }}>
           <textarea aria-label="写作材料或修改要求" placeholder="输入材料、写作要求或修改意见…" rows={4}
             maxLength={50000} disabled={locked} value={instruction} onChange={event => setInstruction(event.target.value)} />
           <div className={styles.composerFooter}><span>{instruction.length ? `${instruction.length.toLocaleString()} / 50,000` : ""}</span>
-            <button type="submit" className={styles.primary} disabled={locked || !instruction.trim()}>{busy ? "处理中…" : "发送 ↑"}</button></div>
+            <button type="submit" className={styles.primary} disabled={locked || Boolean(editing) || !instruction.trim()}>{busy ? "处理中…" : "发送 ↑"}</button></div>
         </form>
       </section>
       <section className={`${styles.panel} ${styles.articlePanel}`} aria-label="文章编辑器" id="writing-article">
@@ -82,12 +93,13 @@ export default function WritingWorkspace() {
       <footer className={styles.dialogActions}><button type="button" disabled={busy} onClick={() => void withBusy(refreshList)}>刷新列表</button></footer>
     </Modal>}
     {pending && <Modal label="unsaved-title" onClose={() => { if (!busy) setPending(null); }}>
-      <h2 id="unsaved-title">还有未保存的内容</h2><p>保存当前正文后切换？输入框中的文字将清空。</p>
+      <h2 id="unsaved-title">还有未保存的内容</h2><p>保存当前正文和回复修改后切换？输入框中的文字将清空。</p>
       {error && <p className={styles.dialogError} role="alert">{error}</p>}
       <div className={styles.dialogActions}>
         <button type="button" disabled={busy} onClick={() => setPending(null)}>取消</button>
         <button type="button" disabled={busy} onClick={() => void withBusy(() => navigate(pending))}>放弃并切换</button>
         <button type="button" className={styles.primary} disabled={busy} onClick={() => void withBusy(async () => {
+          if (editing) await saveMessage();
           if (article) await saveCurrent();
           await navigate(pending);
         })}>保存并切换</button>
