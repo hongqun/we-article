@@ -14,7 +14,7 @@
 - 文章包含标题、Markdown 正文、时间和按序保存的对话；粘贴材料与要求作为用户对话保存。
 - MVP 模型配置只读取项目根目录 `.we-article.env` 中的 `MODEL_API_KEY`、`MODEL_BASE_URL`、`MODEL`、`MODEL_PROVIDER` 和 `STREAMING`，不读取旧工作台的模型配置。通用 OpenAI Chat Completions 兼容接口使用 `MODEL_PROVIDER=openai`，模型须支持工具调用。
 - DeepSeek 思考模式使用 `MODEL_PROVIDER=deepseek`，并通过 `THINKING_ENABLED`、`REASONING_EFFORT` 配置。通用模式不发送 DeepSeek 专有思考参数。 DeepSeek 适配器在 `completionWithRetry` 请求构造边界补回工具调用所需的 `reasoning_content`，复用官方集成的响应解析，不拦截 HTTP 请求。
-- 技能是 `.agents/skills/we-article-writing/SKILL.md` 和 `.agents/skills/we-article-revision/SKILL.md`。
+- 写作技能位于 `.agents/skills/`：`we-article-workflow` 负责协作流程，`we-article-analysis`、`we-article-topic`、`we-article-outline` 分别负责材料解读、选题和大纲，`we-article-writing` 和 `we-article-revision` 负责正文创作与修改。宽泛主题默认先讨论选题，再讨论大纲；用户明确要求直接写作或跳过讨论时可以跳过。中间讨论保存在文章对话中。
 - 该入口及 `/api/we-article/` 接口均无需会话，能访问服务的人可以读写本入口的文章。
 
 ## LangSmith 追踪
@@ -24,7 +24,7 @@
 （默认 `https://api.smith.langchain.com`）；多工作区密钥可设置 `LANGSMITH_WORKSPACE_ID`。
 关闭开关或未填写密钥时不创建追踪客户端。
 
-每次对话以“文章标题 · 写作助手”为运行名，包含模型和工具子调用，标签为 `we-article`、`mvp`。
+每次对话以“文章标题 · 本轮用户消息开头”为运行名，长消息截取前 24 个字符，便于区分各轮；追踪包含模型和工具子调用，标签为 `we-article`、`mvp`。
 元数据保存文章 ID，`thread_id` 使用文章 ID，将同一篇文章的多轮对话关联起来。
 模型元数据记录思考开关、思考等级与流式开关。启用后，输入材料、正文和工具内容会上传至配置的 LangSmith。
 请求成功或失败后均提交追踪队列，上报失败不会覆盖写作结果。
