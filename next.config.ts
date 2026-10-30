@@ -13,8 +13,4 @@ const config: NextConfig = {
   serverExternalPackages: ["better-sqlite3"],
   allowedDevOrigins: ["localhost", "127.0.0.1", ...localDevOrigins],
 };
-export default function nextConfig(phase: string) {
-  // Next 子进程继承运行标记；构建时明确关闭，不能依赖 worker 的命令行推断。
-  process.env.ARTICLE_WECHAT_SERVING = ["phase-development-server", "phase-production-server"].includes(phase) ? "1" : "0";
-  return config;
-}
+export default config;

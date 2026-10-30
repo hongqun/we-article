@@ -34,7 +34,7 @@ export function useWritingWorkspace() {
   const adopt = useCallback((value: Article | null) => {
     setArticle(value); setTitle(value?.title || ""); setBody(value?.body || "");
   }, []);
-  const locationFor = (id?: string) => id ? `/we-article?id=${encodeURIComponent(id)}` : "/we-article";
+  const locationFor = (id?: string) => id ? `/?id=${encodeURIComponent(id)}` : "/";
   const refreshList = useCallback(async () => {
     const items = await json<ArticleSummary[]>(api);
     if (mounted.current) setArticles(items);

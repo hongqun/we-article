@@ -2,7 +2,7 @@ import { ChatOpenAI } from "@langchain/openai";
 import { WritingModel } from "./deepseek-adapter";
 
 export function createWritingModel(settings: Record<string, string>) {
-  // MVP 使用独立配置，不读取旧工作台的模型参数。
+  // 写作模型使用项目配置。
   const provider = settings.MODEL_PROVIDER?.trim().toLowerCase() || "openai";
   const apiKey = settings.MODEL_API_KEY?.trim();
   if (!apiKey) throw new Error("模型未配置：请填写 MODEL_API_KEY");

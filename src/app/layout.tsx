@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import AuthGate from "./AuthGate";
 
 // 本地字体避免启动时依赖额外的字体下载服务。
 export const metadata: Metadata = {
-  title: "文章工作台",
-  description: "从材料解读到写作大纲",
+  title: "We-Article · 写作",
+  description: "对话写作与文章编辑",
   icons: { icon: "/logo-mark.svg" },
 };
 export default function RootLayout({
@@ -15,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
-      <body><AuthGate>{children}</AuthGate></body>
+      <body>{children}</body>
     </html>
   );
 }
