@@ -26,6 +26,17 @@ export default function WritingWorkspace() {
     mobileView, setMobileView, conversation, dirty, locked, refreshList,
     editing, setEditing, messageDirty, saveMessage, withBusy, saveCurrent, navigate, requestNavigation, send } = useWritingWorkspace();
   const [articleView, setArticleView] = useState<"editor" | "layout">("editor");
+  const [copiedMessage, setCopiedMessage] = useState<string | null>(null);
+  // 复制回复的原始 Markdown，保留列表和链接等内容。
+  async function copyMessage(id: string, content: string) {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedMessage(id);
+    } catch {
+      setCopiedMessage(null);
+      setError("复制失败，请检查浏览器剪贴板权限。");
+    }
+  }
   const wordCount = Array.from(body.replace(/\s/g, "")).length;
   const reasoningRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -57,8 +68,11 @@ export default function WritingWorkspace() {
             <time dateTime={message.createdAt}>{new Date(message.createdAt).toLocaleString("zh-CN")}</time>
             <div className={styles.sourceContent}>{message.content}</div></details> : <div className={`${styles.message} ${message.role === "user" ? styles.user : styles.assistant}`} key={message.id}>
             <div className={styles.messageHeader}><span className={styles.messageRole}>{message.role === "user" ? "你" : "We-Article"}</span>
-              {message.role === "assistant" && editing?.id !== message.id && <button type="button" className={styles.editButton}
-                disabled={locked || Boolean(editing)} onClick={() => setEditing({ id: message.id, content: message.content, original: message.content })}>编辑</button>}
+              {message.role === "assistant" && editing?.id !== message.id && <div className={styles.messageHeaderActions}>
+                <button type="button" className={styles.editButton} onClick={() => void copyMessage(message.id, message.content)}>{copiedMessage === message.id ? "已复制" : "复制"}</button>
+                <button type="button" className={styles.editButton}
+                  disabled={locked || Boolean(editing)} onClick={() => { setCopiedMessage(null); setEditing({ id: message.id, content: message.content, original: message.content }); }}>编辑</button>
+              </div>}
             </div>
             {message.role === "user" ? <div className={styles.userContent}>{message.content}</div> : editing?.id === message.id ? <>
               <textarea className={styles.messageEditor} aria-label="编辑助手回复 Markdown" value={editing.content} maxLength={200000}
